@@ -40,7 +40,8 @@ plugins {
 }
 
 group = "ca.solo-studios"
-version = "1.0-SNAPSHOT"
+val versionObj = Version("0", "0", "1")
+version = versionObj.toString()
 
 repositories {
     mavenCentral()
@@ -50,10 +51,15 @@ kotlin {
     explicitApi()
     target {
         compilations.configureEach {
+            // allKotlinSourceSets.forEach {
+            //     it.languageSettings.optIn("")
+            // }
             kotlinOptions {
+                allWarningsAsErrors = true
                 jvmTarget = "1.8"
                 apiVersion = "1.5"
                 languageVersion = "1.5"
+                freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn")
             }
         }
     }
@@ -117,15 +123,19 @@ publishing {
             
             version = version as String
             groupId = group as String
-            artifactId = "guava-kotlin-extensions"
+            artifactId = "guava-kotlin"
             
             pom {
-                name.set("Guava Kotlin Extensions")
+                name.set("Guava Kotlin")
+                description.set(
+                        "Guava Kotlin is a set of extensions and other utilities to Google's Guava library, " +
+                        "to provide a more idiomatic way to use it in Kotlin."
+                               )
                 description.set("A set of Kotlin extensions for the Guava library.")
-                url.set("https://github.com/solo-studios/guava-kotlin-extensions")
-                
+                url.set("https://github.com/solo-studios/guava-kotlin")
+    
                 inceptionYear.set("2022")
-                
+    
                 licenses {
                     license {
                         name.set("Apache License 2.0")
@@ -142,12 +152,12 @@ publishing {
                 }
                 issueManagement {
                     system.set("GitHub")
-                    url.set("https://github.com/solo-studios/guava-kotlin-extensions/issues")
+                    url.set("https://github.com/solo-studios/guava-kotlin/issues")
                 }
                 scm {
-                    connection.set("scm:git:https://github.com/solo-studios/guava-kotlin-extensions.git")
-                    developerConnection.set("scm:git:ssh://github.com/solo-studios/guava-kotlin-extensions.git")
-                    url.set("https://github.com/solo-studios/guava-kotlin-extensions/")
+                    connection.set("scm:git:https://github.com/solo-studios/guava-kotlin.git")
+                    developerConnection.set("scm:git:ssh://github.com/solo-studios/guava-kotlin.git")
+                    url.set("https://github.com/solo-studios/guava-kotlin/")
                 }
             }
         }
@@ -188,7 +198,7 @@ idea {
         settings {
             copyright {
                 profiles {
-                    val copyright = create("PolyBot") {
+                    val copyright = create("guava-kotlin") {
                         notice = """
                             |Copyright (c) ${"$"}originalComment.match("Copyright \(c\) (\d+)", 1, "-")${"$"}today.year solonovamax <solonovamax@12oclockpoint.com>
                             |

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-rootProject.name = "guava-kotlin-extensions"
+rootProject.name = "guava-kotlin"
 
 pluginManagement {
     repositories {
