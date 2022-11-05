@@ -34,12 +34,12 @@ import com.google.common.collect.ImmutableSetMultimap as ImmutableGuavaSetMultim
 import com.google.common.collect.SetMultimap as GuavaSetMultimap
 
 /**
- * Returns an empty read-only multimap.
+ * Returns an empty read-only [SetMultimap].
  */
 public inline fun <K, V> emptySetMultimap(): SetMultimap<K, V> = ImmutableGuavaSetMultimap.of<K, V>().toKotlin()
 
 /**
- * Returns a new read-only multimap of given elements.
+ * Returns a new read-only [SetMultimap] of given elements.
  */
 public inline fun <K, V> setMultimapOf(vararg elements: Pair<K, V>): SetMultimap<K, V> {
     return if (elements.isNotEmpty())
@@ -55,7 +55,7 @@ public inline fun <K, V> setMultimapOf(vararg elements: Pair<K, V>): SetMultimap
 }
 
 /**
- * Returns a new read-only multimap of given elements.
+ * Returns a new read-only [SetMultimap] of given elements.
  */
 @JvmName("setMultimapOfCollection")
 public inline fun <K, V> setMultimapOf(vararg elements: Pair<K, Collection<V>>): SetMultimap<K, V> {
@@ -72,17 +72,17 @@ public inline fun <K, V> setMultimapOf(vararg elements: Pair<K, Collection<V>>):
 }
 
 /**
- * Returns an empty read-only list.
+ * Returns an empty read-only [SetMultimap].
  */
 public inline fun <K, V> setMultimapOf(): SetMultimap<K, V> = emptySetMultimap()
 
 /**
- * Returns an empty new [MutableList].
+ * Returns an empty new [MutableMultimap].
  */
 public inline fun <K, V> mutableSetMultimapOf(): SetMultimap<K, V> = HashMultimap.create<K, V>().toKotlin()
 
 /**
- * Returns a new [MutableList] with the given elements.
+ * Returns a new [MutableMultimap] with the given elements.
  */
 public inline fun <K, V> mutableSetMultimapOf(vararg elements: Pair<K, V>): SetMultimap<K, V> {
     return MultimapBuilder.hashKeys()
@@ -96,7 +96,7 @@ public inline fun <K, V> mutableSetMultimapOf(vararg elements: Pair<K, V>): SetM
 }
 
 /**
- * Returns a new [MutableList] with the given elements.
+ * Returns a new [MutableMultimap] with the given elements.
  */
 @JvmName("mutableSetMultimapOfCollection")
 public inline fun <K, V> mutableSetMultimapOf(vararg elements: Pair<K, Collection<V>>): MutableSetMultimap<K, V> {
@@ -110,14 +110,41 @@ public inline fun <K, V> mutableSetMultimapOf(vararg elements: Pair<K, Collectio
             .toKotlin()
 }
 
+/**
+ * Wraps an immutable guava set multimap into a [SetMultimap] instance.
+ *
+ * @return The wrapped guava set multimap.
+ *
+ * @see GuavaSetMultimap
+ * @see MutableSetMultimap
+ * @see SetMultimap
+ */
 public fun <K, V> ImmutableGuavaSetMultimap<K, V>.toKotlin(): SetMultimap<K, V> {
     return GuavaSetMultimapWrapper(this)
 }
 
+/**
+ * Wraps a guava set multimap into a [MutableSetMultimap] instance.
+ *
+ * @return The wrapped guava set multimap.
+ *
+ * @see GuavaSetMultimap
+ * @see MutableSetMultimap
+ * @see SetMultimap
+ */
 public fun <K, V> GuavaSetMultimap<K, V>.toKotlin(): MutableSetMultimap<K, V> {
     return MutableGuavaSetMultimapWrapper(this)
 }
 
+/**
+ * Transforms a [SetMultimap] into its immutable guava equivalent
+ *
+ * @return A copy of the backing guava set multimap.
+ *
+ * @see ImmutableGuavaSetMultimap
+ * @see GuavaSetMultimap
+ * @see SetMultimap
+ */
 @ExperimentalCollectionsApi
 @Suppress("UnstableApiUsage")
 public fun <K, V> SetMultimap<K, V>.toGuava(): ImmutableGuavaSetMultimap<K, V> {
@@ -127,6 +154,15 @@ public fun <K, V> SetMultimap<K, V>.toGuava(): ImmutableGuavaSetMultimap<K, V> {
     }
 }
 
+/**
+ * Transforms a [MutableSetMultimap] into its guava equivalent
+ *
+ * @return A copy of the backing guava set multimap.
+ *
+ * @see GuavaSetMultimap
+ * @see MutableSetMultimap
+ * @see SetMultimap
+ */
 public fun <K, V> MutableSetMultimap<K, V>.toGuava(): GuavaSetMultimap<K, V> {
     return when (this) {
         is MutableGuavaSetMultimapWrapper -> MultimapBuilder.hashKeys().hashSetValues().build(this.guavaMultimap)
@@ -350,7 +386,7 @@ public enum class SetMultimapValueType {
  * The [get] and [asMap] methods return a [Set] of values.
  *
  * Methods in this interface support only read-only access to the multimap;
- * read-write access is supported through the [MutableListMultimap] interface.
+ * read-write access is supported through the [MutableSetMultimap] interface.
  *
  * See the Guava User Guide article on [`Multimap`](https://github.com/google/guava/wiki/NewCollectionTypesExplained#multimap).
  *

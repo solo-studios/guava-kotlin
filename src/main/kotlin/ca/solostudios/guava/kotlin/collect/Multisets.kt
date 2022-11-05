@@ -31,15 +31,41 @@ import com.google.common.collect.ImmutableMultiset as ImmutableGuavaMultiset
 import com.google.common.collect.LinkedHashMultiset as GuavaLinkedHashMultiset
 import com.google.common.collect.Multiset as GuavaMultiset
 
-
+/**
+ * Wraps an immutable guava multiset into a [Multiset] instance.
+ *
+ * @return The wrapped guava multiset.
+ *
+ * @see GuavaMultiset
+ * @see MutableMultiset
+ * @see Multiset
+ */
 public fun <E> ImmutableGuavaMultiset<E>.toKotlin(): Multiset<E> {
     return GuavaMultisetWrapper(this)
 }
 
+/**
+ * Wraps a guava multiset into a [MutableMultiset] instance.
+ *
+ * @return The wrapped guava multiset.
+ *
+ * @see GuavaMultiset
+ * @see MutableMultiset
+ * @see Multiset
+ */
 public fun <E> GuavaMultiset<E>.toKotlin(): MutableMultiset<E> {
     return MutableGuavaMultisetWrapper(this)
 }
 
+/**
+ * Transforms a [Multiset] into its immutable guava equivalent
+ *
+ * @return A copy of the backing guava multiset.
+ *
+ * @see ImmutableGuavaMultiset
+ * @see GuavaMultiset
+ * @see Multiset
+ */
 public fun <E> Multiset<E>.toGuava(): ImmutableGuavaMultiset<E> {
     return when (this) {
         is AbstractGuavaMultisetWrapper -> ImmutableGuavaMultiset.copyOf(this.guavaMultiset)
@@ -47,6 +73,15 @@ public fun <E> Multiset<E>.toGuava(): ImmutableGuavaMultiset<E> {
     }
 }
 
+/**
+ * Transforms a [MutableMultiset] into its guava equivalent
+ *
+ * @return A copy of the backing guava multiset.
+ *
+ * @see GuavaMultiset
+ * @see MutableMultiset
+ * @see Multiset
+ */
 public fun <E> MutableMultiset<E>.toGuava(): GuavaMultiset<E> {
     return when (this) {
         is AbstractMutableGuavaMultisetWrapper -> this.guavaMultiset
@@ -211,14 +246,14 @@ public interface Multiset<out E> : Collection<E> {
     
     // Views
     /**
-     * Returns a read-only [Set] of all non-duplicate values in this map.
+     * Returns a read-only [Set] of all non-duplicate values in this set.
      *
      * @see GuavaMultiset.elementSet
      */
     public val elementSet: Set<E>
     
     /**
-     * Returns a read-only [Collection] of all elements in this map, grouped into [Multiset.Entry][GuavaMultiset.Entry] instances,
+     * Returns a read-only [Collection] of all elements in this set, grouped into [Multiset.Entry][GuavaMultiset.Entry] instances,
      * each providing an element of the multiset and the count of that element.
      *
      * @see GuavaMultiset.entrySet
@@ -230,7 +265,7 @@ public interface Multiset<out E> : Collection<E> {
  * A generic unordered collection that supports order-independent equality, like [Set], but may have duplicate
  * elements. A multiset is also sometimes called a *bag*.
  *
- * See the Guava User Guide article on [`Multiset`](https://github.com/google/guava/wiki/NewCollectionTypesExplained#multimap).
+ * See the Guava User Guide article on [`Multiset`](https://github.com/google/guava/wiki/NewCollectionTypesExplained#multiset).
  *
  * @param E the type of elements contained in the set. The set is covariant in its element type.
  *

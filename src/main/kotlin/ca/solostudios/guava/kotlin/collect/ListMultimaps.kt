@@ -34,12 +34,12 @@ import com.google.common.collect.ListMultimap as GuavaListMultimap
 import com.google.common.collect.MultimapBuilder as GuavaMultimapBuilder
 
 /**
- * Returns an empty read-only multimap.
+ * Returns an empty read-only [ListMultimap].
  */
 public inline fun <K, V> emptyListMultimap(): ListMultimap<K, V> = ImmutableGuavaListMultimap.of<K, V>().toKotlin()
 
 /**
- * Returns a new read-only multimap of given elements.
+ * Returns a new read-only [ListMultimap] of given elements.
  */
 public inline fun <K, V> listMultimapOf(vararg elements: Pair<K, V>): ListMultimap<K, V> {
     return if (elements.isNotEmpty())
@@ -55,7 +55,7 @@ public inline fun <K, V> listMultimapOf(vararg elements: Pair<K, V>): ListMultim
 }
 
 /**
- * Returns a new read-only multimap of given elements.
+ * Returns a new read-only [ListMultimap] of given elements.
  */
 @JvmName("listMultimapOfCollection")
 public inline fun <K, V> listMultimapOf(vararg elements: Pair<K, Collection<V>>): ListMultimap<K, V> {
@@ -72,17 +72,17 @@ public inline fun <K, V> listMultimapOf(vararg elements: Pair<K, Collection<V>>)
 }
 
 /**
- * Returns an empty read-only list.
+ * Returns an empty read-only [ListMultimap].
  */
 public inline fun <K, V> listMultimapOf(): ListMultimap<K, V> = emptyListMultimap()
 
 /**
- * Returns an empty new [MutableList].
+ * Returns an empty new [ListMultimap].
  */
 public inline fun <K, V> mutableListMultimapOf(): ListMultimap<K, V> = GuavaArrayListMultimap.create<K, V>().toKotlin()
 
 /**
- * Returns a new [MutableList] with the given elements.
+ * Returns a new [ListMultimap] with the given elements.
  */
 public inline fun <K, V> mutableListMultimapOf(vararg elements: Pair<K, V>): ListMultimap<K, V> {
     return GuavaMultimapBuilder.hashKeys()
@@ -96,7 +96,7 @@ public inline fun <K, V> mutableListMultimapOf(vararg elements: Pair<K, V>): Lis
 }
 
 /**
- * Returns a new [MutableList] with the given elements.
+ * Returns a new [ListMultimap] with the given elements.
  */
 @JvmName("mutableListMultimapOfCollection")
 public inline fun <K, V> mutableListMultimapOf(vararg elements: Pair<K, Collection<V>>): MutableListMultimap<K, V> {
@@ -110,14 +110,41 @@ public inline fun <K, V> mutableListMultimapOf(vararg elements: Pair<K, Collecti
             .toKotlin()
 }
 
+/**
+ * Wraps an immutable guava list multimap into a [ListMultimap] instance.
+ *
+ * @return The wrapped guava list multimap.
+ *
+ * @see GuavaListMultimap
+ * @see MutableListMultimap
+ * @see ListMultimap
+ */
 public fun <K, V> ImmutableGuavaListMultimap<K, V>.toKotlin(): ListMultimap<K, V> {
     return GuavaListMultimapWrapper(this)
 }
 
+/**
+ * Wraps a guava list multimap into a [MutableListMultimap] instance.
+ *
+ * @return The wrapped guava list multimap.
+ *
+ * @see GuavaListMultimap
+ * @see MutableListMultimap
+ * @see ListMultimap
+ */
 public fun <K, V> GuavaListMultimap<K, V>.toKotlin(): MutableListMultimap<K, V> {
     return MutableGuavaListMultimapWrapper(this)
 }
 
+/**
+ * Transforms a [ListMultimap] into its immutable guava equivalent
+ *
+ * @return A copy of the backing guava list multimap.
+ *
+ * @see ImmutableGuavaListMultimap
+ * @see GuavaListMultimap
+ * @see ListMultimap
+ */
 @ExperimentalCollectionsApi
 @Suppress("UnstableApiUsage")
 public fun <K, V> ListMultimap<K, V>.toGuava(): ImmutableGuavaListMultimap<K, V> {
@@ -127,6 +154,15 @@ public fun <K, V> ListMultimap<K, V>.toGuava(): ImmutableGuavaListMultimap<K, V>
     }
 }
 
+/**
+ * Transforms a [MutableListMultimap] into its guava equivalent
+ *
+ * @return A copy of the backing guava list multimap.
+ *
+ * @see GuavaListMultimap
+ * @see MutableListMultimap
+ * @see ListMultimap
+ */
 public fun <K, V> MutableListMultimap<K, V>.toGuava(): GuavaListMultimap<K, V> {
     return when (this) {
         is MutableGuavaListMultimapWrapper -> GuavaMultimapBuilder.hashKeys().arrayListValues().build(this.guavaMultimap)

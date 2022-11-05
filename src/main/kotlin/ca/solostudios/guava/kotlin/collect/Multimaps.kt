@@ -24,14 +24,41 @@ import kotlin.collections.Map.Entry
 import com.google.common.collect.ImmutableMultimap as ImmutableGuavaMultimap
 import com.google.common.collect.Multimap as GuavaMultimap
 
+/**
+ * Wraps an immutable guava multimap into a [Multimap] instance.
+ *
+ * @return The wrapped guava multimap.
+ *
+ * @see GuavaMultimap
+ * @see MutableMultimap
+ * @see Multimap
+ */
 public fun <K, V> ImmutableGuavaMultimap<K, V>.toKotlin(): Multimap<K, V> {
     return GuavaMultimapWrapper(ImmutableListMultimap.copyOf(this))
 }
 
+/**
+ * Wraps a guava multimap into a [MutableMultimap] instance.
+ *
+ * @return The wrapped guava multimap.
+ *
+ * @see GuavaMultimap
+ * @see MutableMultimap
+ * @see Multimap
+ */
 public fun <K, V> GuavaMultimap<K, V>.toKotlin(): MutableMultimap<K, V> {
     return MutableGuavaMultimapWrapper(this)
 }
 
+/**
+ * Transforms a [Multimap] into its immutable guava equivalent
+ *
+ * @return A copy of the backing guava multimap.
+ *
+ * @see ImmutableGuavaMultimap
+ * @see GuavaMultimap
+ * @see Multimap
+ */
 @ExperimentalCollectionsApi
 @Suppress("UnstableApiUsage")
 public fun <K, V> Multimap<K, V>.toGuava(): ImmutableGuavaMultimap<K, V> {
@@ -41,6 +68,15 @@ public fun <K, V> Multimap<K, V>.toGuava(): ImmutableGuavaMultimap<K, V> {
     }
 }
 
+/**
+ * Transforms a [MutableMultimap] into its guava equivalent
+ *
+ * @return A copy of the backing guava multimap.
+ *
+ * @see GuavaMultimap
+ * @see Multimap
+ * @see MutableMultimap
+ */
 public fun <K, V> MutableMultimap<K, V>.toGuava(): GuavaMultimap<K, V> {
     return when (this) {
         is AbstractMutableGuavaMultimapWrapper -> MultimapBuilder.hashKeys().arrayListValues().build(this.guavaMultimap)
