@@ -57,8 +57,8 @@ kotlin {
             kotlinOptions {
                 allWarningsAsErrors = true
                 jvmTarget = "1.8"
-                apiVersion = "1.5"
-                languageVersion = "1.5"
+                apiVersion = "1.6"
+                languageVersion = "1.6"
                 freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn")
             }
         }
