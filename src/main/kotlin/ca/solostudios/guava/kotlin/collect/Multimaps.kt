@@ -58,6 +58,37 @@ public fun <K, V> MutableMultimap<K, V>.toGuava(): GuavaMultimap<K, V> {
 }
 
 /**
+ * The value collection type for a multimap.
+ * Used by the [ListMultimap], and [SetMultimap] builder inference methods.
+ *
+ * @see buildMutableListMultimap
+ * @see buildMutableSetMultimap
+ * @see MultimapBuilder
+ */
+public enum class MultimapKeyType {
+    /**
+     * Uses a backing tree map to store keys.
+     *
+     * @see MultimapBuilder.treeKeys
+     */
+    TREE_KEYS,
+    
+    /**
+     * Uses a backing hash map to store keys.
+     *
+     * @see MultimapBuilder.hashKeys
+     */
+    HASH_KEYS,
+    
+    /**
+     * Uses a backing linked hash map to store keys.
+     *
+     * @see MultimapBuilder.linkedHashKeys
+     */
+    LINKED_HASH_KEYS
+}
+
+/**
  * A collection that holds pairs of objects (keys and values),
  * however each key may be associated with *multiple* values.
  *

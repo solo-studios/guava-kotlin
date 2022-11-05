@@ -19,7 +19,15 @@
 package ca.solostudios.guava.kotlin.collect
 
 import ca.solostudios.guava.kotlin.annotations.ExperimentalCollectionsApi
+import ca.solostudios.guava.kotlin.collect.ListMultimapValueType.ARRAY_LIST
+import ca.solostudios.guava.kotlin.collect.ListMultimapValueType.LINKED_LIST
+import ca.solostudios.guava.kotlin.collect.MultimapKeyType.HASH_KEYS
+import ca.solostudios.guava.kotlin.collect.MultimapKeyType.LINKED_HASH_KEYS
+import ca.solostudios.guava.kotlin.collect.MultimapKeyType.TREE_KEYS
+import com.google.common.collect.MultimapBuilder
+import com.google.common.collect.MultimapBuilder.ListMultimapBuilder
 import com.google.common.collect.Multimaps
+import kotlin.experimental.ExperimentalTypeInference
 import com.google.common.collect.ArrayListMultimap as GuavaArrayListMultimap
 import com.google.common.collect.ImmutableListMultimap as ImmutableGuavaListMultimap
 import com.google.common.collect.ListMultimap as GuavaListMultimap
@@ -133,6 +141,130 @@ public fun <K, V> MutableListMultimap<K, V>.toGuava(): GuavaListMultimap<K, V> {
                     }
         }
     }
+}
+
+/**
+ * Builds a new immutable list-multimap with the given [builderAction],
+ * using the builder inference api.
+ *
+ * @param K The key type of the list-multimap. Must be an enum.
+ * @param V The value type of the list-multimap.
+ *
+ * @param builderAction The builder action to apply to the list-multimap
+ *
+ * @receiver A builder action applied to immutable list-multimap builder.
+ *
+ * @return The newly created list-multimap.
+ *
+ * @see ImmutableGuavaListMultimap.Builder
+ */
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <K, V> buildListMultimap(
+    @BuilderInference builderAction: ImmutableGuavaListMultimap.Builder<K, V>.() -> Unit,
+                                          ): ListMultimap<K, V> {
+    return ImmutableGuavaListMultimap.builder<K, V>()
+            .apply(builderAction)
+            .build()
+            .toKotlin()
+}
+
+/**
+ * Builds a new mutable list-multimap with the given [builderAction],
+ * using the builder inference api.
+ *
+ * @param K The key type of the list-multimap.
+ * @param V The value type of the list-multimap.
+ *
+ * @param keyType The backing collection type used for the list-multimap base map.
+ * @param valueType The backing collection type used for the list-multimap values.
+ * @param builderAction The builder action to apply to the list-multimap
+ *
+ * @receiver A builder action applied to the returned list-multimap.
+ *
+ * @return The newly created list-multimap.
+ *
+ * @see MultimapBuilder
+ */
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <K, V> buildMutableListMultimap(
+    keyType: MultimapKeyType = HASH_KEYS,
+    valueType: ListMultimapValueType = ARRAY_LIST,
+    @BuilderInference builderAction: MutableListMultimap<K, V>.() -> Unit,
+                                                 ): MutableListMultimap<K, V> {
+    
+    val multimapBuilderWithKeys = when (keyType) {
+        TREE_KEYS        -> MultimapBuilder.treeKeys()
+        HASH_KEYS        -> MultimapBuilder.hashKeys()
+        LINKED_HASH_KEYS -> MultimapBuilder.linkedHashKeys()
+    }
+    
+    @Suppress("UNCHECKED_CAST")
+    val multimapBuilder = multimapBuilderWithKeys.run {
+        when (valueType) {
+            ARRAY_LIST  -> arrayListValues()
+            LINKED_LIST -> linkedListValues()
+        } as ListMultimapBuilder<K, V>
+    }
+    
+    
+    
+    return multimapBuilder.build<K, V>()
+            .toKotlin()
+            .apply(builderAction)
+}
+
+/**
+ * Builds a new mutable list-multimap with the given [builderAction],
+ * using the builder inference api, that is always backed by an enum map.
+ *
+ * @param K The key type of the list-multimap. Must be an enum.
+ * @param V The value type of the list-multimap.
+ *
+ * @param valueType The backing collection type used for the list-multimap values.
+ * @param builderAction The builder action to apply to the list-multimap
+ *
+ * @receiver A builder action applied to the returned list-multimap.
+ * @return The newly created list-multimap.
+ *
+ * @see MultimapBuilder
+ */
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <reified K : Enum<K>, V> buildMutableListMultimap(
+    valueType: ListMultimapValueType = ARRAY_LIST,
+    @BuilderInference builderAction: MutableListMultimap<K, V>.() -> Unit,
+                                                                   ): MutableListMultimap<K, V> {
+    val multimapBuilder = MultimapBuilder.enumKeys(K::class.java).run {
+        when (valueType) {
+            ARRAY_LIST  -> arrayListValues()
+            LINKED_LIST -> linkedListValues()
+        }
+    }
+    return multimapBuilder.build<K, V>()
+            .toKotlin()
+            .apply(builderAction)
+}
+
+/**
+ * The list collection type for a multimap.
+ * Used by the [ListMultimap] builder inference methods.
+ *
+ * @see buildMutableListMultimap
+ * @see MultimapBuilder
+ */
+public enum class ListMultimapValueType {
+    /**
+     * Uses a backing array list to store values.
+     *
+     * @see MultimapBuilder.MultimapBuilderWithKeys.arrayListValues
+     */
+    ARRAY_LIST,
+    
+    /**
+     * Uses a backing linked list to store values.
+     *
+     * @see MultimapBuilder.MultimapBuilderWithKeys.linkedListValues
+     */
+    LINKED_LIST,
 }
 
 /**

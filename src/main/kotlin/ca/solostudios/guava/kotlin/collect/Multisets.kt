@@ -17,12 +17,18 @@
 package ca.solostudios.guava.kotlin.collect
 
 import ca.solostudios.guava.kotlin.annotations.ExperimentalCollectionsApi
-import com.google.common.collect.HashMultiset
+import ca.solostudios.guava.kotlin.collect.SetMultisetType.CONCURRENT_HASH_MULTISET
+import ca.solostudios.guava.kotlin.collect.SetMultisetType.HASH_MULTISET
+import ca.solostudios.guava.kotlin.collect.SetMultisetType.LINKED_HASH_MULTISET
 import com.google.common.collect.ImmutableMultiset
 import com.google.common.collect.Iterables
 import com.google.common.collect.Multisets
 import java.util.Collections
+import kotlin.experimental.ExperimentalTypeInference
+import com.google.common.collect.ConcurrentHashMultiset as GuavaConcurrentHashMultiset
+import com.google.common.collect.HashMultiset as GuavaHashMultiset
 import com.google.common.collect.ImmutableMultiset as ImmutableGuavaMultiset
+import com.google.common.collect.LinkedHashMultiset as GuavaLinkedHashMultiset
 import com.google.common.collect.Multiset as GuavaMultiset
 
 
@@ -44,12 +50,12 @@ public fun <E> Multiset<E>.toGuava(): ImmutableGuavaMultiset<E> {
 public fun <E> MutableMultiset<E>.toGuava(): GuavaMultiset<E> {
     return when (this) {
         is AbstractMutableGuavaMultisetWrapper -> this.guavaMultiset
-        else                                   -> HashMultiset.create(this)
+        else                                   -> GuavaHashMultiset.create(this)
     }
 }
 
 public fun <E> Collection<E>.toMutableMultiset(): MutableMultiset<E> {
-    return HashMultiset.create(this).toKotlin()
+    return GuavaHashMultiset.create(this).toKotlin()
 }
 
 public fun <E> Collection<E>.toMultiset(): Multiset<E> {
@@ -66,6 +72,91 @@ public operator fun <E> Multiset<E>.plus(other: Multiset<E>): Multiset<E> {
 @Suppress("UnstableApiUsage")
 public operator fun <E> Multiset<E>.minus(other: Multiset<E>): Multiset<E> {
     return Multisets.difference(this.toGuava(), other.toGuava()).toKotlin()
+}
+
+/**
+ * Builds a new immutable multiset with the given [builderAction],
+ * using the builder inference api.
+ *
+ * @param E the type of the multiset
+ *
+ * @param builderAction The builder action to apply to the multiset
+ *
+ * @receiver A builder action applied to immutable multiset builder.
+ *
+ * @return The newly created multiset.
+ *
+ * @see ImmutableGuavaMultiset.Builder
+ */
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <E> buildMultiset(
+    @BuilderInference builderAction: ImmutableMultiset.Builder<E>.() -> Unit,
+                                   ): Multiset<E> {
+    return ImmutableMultiset.builder<E>()
+            .apply(builderAction)
+            .build()
+            .toKotlin()
+}
+
+/**
+ * Builds a new multiset with the given [builderAction],
+ * using the builder inference api.
+ *
+ * @param E the type of the multiset
+ *
+ * @param valueType The collection type used for the backing multiset map.
+ * @param builderAction The builder action to apply to the multiset
+ *
+ * @receiver A builder action applied to the returned multiset.
+ *
+ * @return The newly created multiset.
+ *
+ * @see Multiset
+ * @see GuavaHashMultiset
+ *
+ */
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <E> buildMutableMultiset(
+    valueType: SetMultisetType = HASH_MULTISET,
+    @BuilderInference builderAction: MutableMultiset<E>.() -> Unit,
+                                          ): MutableMultiset<E> {
+    val guavaMultiset = when (valueType) {
+        HASH_MULTISET            -> GuavaHashMultiset.create<E>()
+        LINKED_HASH_MULTISET     -> GuavaLinkedHashMultiset.create<E>()
+        CONCURRENT_HASH_MULTISET -> GuavaConcurrentHashMultiset.create<E>()
+    }
+    
+    return guavaMultiset.toKotlin().apply(builderAction)
+}
+
+/**
+ * The backing collection type for multiset.
+ * Used by the [Multiset] builder inference methods.
+ *
+ * @see buildMutableMultiset
+ * @see Multiset
+ */
+public enum class SetMultisetType {
+    /**
+     * Uses a backing hashmap to store values.
+     *
+     * @see GuavaHashMultiset
+     */
+    HASH_MULTISET,
+    
+    /**
+     * Uses a backing linked hashmap to store values.
+     *
+     * @see GuavaLinkedHashMultiset
+     */
+    LINKED_HASH_MULTISET,
+    
+    /**
+     * Uses a backing concurrent hashmap to store values.
+     *
+     * @see GuavaConcurrentHashMultiset
+     */
+    CONCURRENT_HASH_MULTISET
 }
 
 /**
