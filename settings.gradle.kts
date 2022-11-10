@@ -22,3 +22,14 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.jetbrains.dokka:versioning-plugin:1.7.20")
+        classpath("org.jetbrains.dokka:dokka-core:1.7.20")
+        classpath("org.jetbrains.dokka:dokka-base:1.7.20")
+    }
+}

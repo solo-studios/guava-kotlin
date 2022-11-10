@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
-@file:Suppress("DSL_SCOPE_VIOLATION")
+@file:Suppress("DSL_SCOPE_VIOLATION", "UnstableApiUsage")
 
+import org.gradle.plugins.ide.idea.model.IdeaProject
+import org.jetbrains.dokka.base.DokkaBase
+import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.versioning.VersioningConfiguration
+import org.jetbrains.dokka.versioning.VersioningPlugin
 import org.jetbrains.gradle.ext.ActionDelegationConfig
 import org.jetbrains.gradle.ext.CodeStyleConfig
 import org.jetbrains.gradle.ext.CopyrightConfiguration
@@ -24,6 +29,9 @@ import org.jetbrains.gradle.ext.GroovyCompilerConfiguration
 import org.jetbrains.gradle.ext.IdeaCompilerConfiguration
 import org.jetbrains.gradle.ext.ProjectSettings
 import org.jetbrains.gradle.ext.RunConfiguration
+import org.jetbrains.kotlin.incremental.cleanDirectoryContents
+import java.net.URL
+import java.time.Year
 import kotlin.math.max
 
 plugins {
@@ -71,6 +79,8 @@ dependencies {
     
     testImplementation(libs.bundles.junit)
     testImplementation(kotlin("test"))
+    
+    dokkaPlugin(libs.dokka.versioning.plugin)
 }
 
 tasks {
@@ -88,28 +98,100 @@ tasks {
     }
     
     withType<Jar>().configureEach {
-        from(rootProject.file("LICENSE"))
+        metaInf {
+            from(rootProject.file("LICENSE"))
+        }
+    }
+    
+    withType<DokkaTask>().configureEach {
+        dependsOn(processDokkaIncludes)
+        
+        var outputDirectory by outputDirectory
+        val docsVersionsDir = outputDirectory.resolve("versions")
+        val docsCurrentVersionDir = docsVersionsDir.resolve(version.toString())
+        val docsOlderVersions = docsVersionsDir.listFiles { file: File -> file != docsCurrentVersionDir }?.toList().orEmpty()
+        val renderedDocsDir = buildDir.resolve("docs").resolve(outputDirectory.name)
+        
+        
+        outputDirectory = docsCurrentVersionDir
+        
+        docsOlderVersions.forEach {
+            inputs.dir(it)
+        }
+        outputs.dirs(renderedDocsDir, docsCurrentVersionDir)
+        
+        
+        pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
+            footerMessage = "© ${Year.now()} Copyright solo-studios"
+        }
+        
+        pluginConfiguration<VersioningPlugin, VersioningConfiguration> {
+            version = project.version.toString()
+            olderVersions = docsOlderVersions
+        }
+        
+        doFirst {
+            docsCurrentVersionDir.cleanDirectoryContents()
+        }
+        
+        doLast {
+            renderedDocsDir.deleteRecursively()
+            docsCurrentVersionDir.copyRecursively(renderedDocsDir)
+            docsCurrentVersionDir.resolve("older").deleteRecursively()
+        }
+        
+        dokkaSourceSets.configureEach {
+            includes.from(processDokkaIncludes.destinationDir.listFiles())
+            
+            jdkVersion.set(8)
+            reportUndocumented.set(true)
+            // Documentation link
+            
+            sourceLink {
+                localDirectory.set(file("src/main/kotlin"))
+                remoteUrl.set(URL("https://github.com/solo-studios/guava-kotlin/tree/master/src/main/kotlin"))
+                remoteLineSuffix.set("#L")
+            }
+            
+            val guavaVersion = libs.guava.get().versionConstraint.requiredVersion.ifEmpty { "snapshot" }
+            val guavaDocsUrl = "https://guava.dev/releases/$guavaVersion/api/docs/"
+            
+            externalDocumentationLink(guavaDocsUrl, "$guavaDocsUrl/element-list")
+        }
+        
+        group = JavaBasePlugin.DOCUMENTATION_GROUP
     }
 }
 
-val dokkaHtml by tasks.getting(DokkaTask::class)
-
-val javadoc by tasks.getting(Javadoc::class)
-
-val jar by tasks.getting(Jar::class)
-
-val javadocJar by tasks.creating(Jar::class) {
-    dependsOn(dokkaHtml)
-    archiveClassifier.set("javadoc")
-    from(dokkaHtml.outputDirectory)
+val processDokkaIncludes by tasks.register("processDokkaIncludes", ProcessResources::class) {
+    from(projectDir.resolve("dokka/includes")) {
+        val projectInfo = ProjectInfo(project.group.toString(), project.name, versionObj)
+        filesMatching("Module.md") {
+            expand("project" to projectInfo)
+        }
+    }
+    destinationDir = buildDir.resolve("dokka-include")
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
 }
 
-val sourcesJar by tasks.creating(Jar::class) {
-    archiveClassifier.set("sources")
+val dokkaHtml by tasks.named<DokkaTask>("dokkaHtml")
+val jar by tasks.named<Jar>("jar")
+
+val javadocJar by tasks.registering(Jar::class) {
+    dependsOn(dokkaHtml)
+    from(dokkaHtml.outputDirectory)
+    archiveClassifier.set("javadoc")
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
+}
+
+val sourcesJar by tasks.registering(Jar::class) {
     from(sourceSets["main"].allSource)
+    archiveClassifier.set("sources")
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
 }
 
 artifacts {
+    archives(jar)
     archives(sourcesJar)
     archives(javadocJar)
 }
@@ -117,14 +199,14 @@ artifacts {
 publishing {
     publications {
         create<MavenPublication>("maven") {
+            artifact(jar)
             artifact(sourcesJar)
             artifact(javadocJar)
-            artifact(jar)
-            
-            version = version as String
-            groupId = group as String
+    
+            version = version.toString()
+            groupId = group.toString()
             artifactId = "guava-kotlin"
-            
+    
             pom {
                 name.set("Guava Kotlin")
                 description.set(
@@ -133,9 +215,9 @@ publishing {
                                )
                 description.set("A set of Kotlin extensions for the Guava library.")
                 url.set("https://github.com/solo-studios/guava-kotlin")
-    
+        
                 inceptionYear.set("2022")
-    
+        
                 licenses {
                     license {
                         name.set("Apache License 2.0")
@@ -167,7 +249,7 @@ publishing {
         maven {
             name = "sonatypeStaging"
             url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2")
-            credentials(org.gradle.api.credentials.PasswordCredentials::class)
+            credentials(PasswordCredentials::class)
         }
         maven {
             name = "sonatypeSnapshot"
@@ -188,6 +270,11 @@ signing {
 data class Version(val major: String, val minor: String, val patch: String) {
     override fun toString(): String = "$major.$minor.$patch"
 }
+
+/**
+ * Project info class for [processDokkaIncludes].
+ */
+data class ProjectInfo(val group: String, val module: String, val version: Version)
 
 /*-----------------------*
  | BEGIN IntelliJ Config |
@@ -241,7 +328,7 @@ idea {
  | BEGIN Utility Methods |
  *-----------------------*/
 
-fun org.gradle.plugins.ide.idea.model.IdeaProject.settings(configuration: ProjectSettings.() -> Unit) {
+fun IdeaProject.settings(configuration: ProjectSettings.() -> Unit) {
     (this as ExtensionAware).configure(configuration)
 }
 
