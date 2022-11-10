@@ -16,7 +16,7 @@
 
 package ca.solostudios.guava.kotlin.collect
 
-import com.google.common.collect.Multimaps
+import java.util.Spliterator
 import kotlin.collections.Map.Entry
 import com.google.common.collect.Multimap as GuavaMultimap
 
@@ -26,8 +26,7 @@ internal abstract class AbstractGuavaMultimapWrapper<K, out V> : Multimap<K, V> 
     
     override fun get(key: K): Collection<@UnsafeVariance V> = guavaMultimap.get(key)
     
-    @Suppress("UnstableApiUsage")
-    override fun asMap(): Map<K, Collection<@UnsafeVariance V>> = Multimaps.asMap(guavaMultimap)
+    override fun asMap(): Map<K, Collection<@UnsafeVariance V>> = guavaMultimap.asMap()
     
     override val size: Int
         get() = guavaMultimap.size()
@@ -51,6 +50,19 @@ internal abstract class AbstractGuavaMultimapWrapper<K, out V> : Multimap<K, V> 
     
     override val entries: Collection<Entry<K, V>>
         get() = guavaMultimap.entries()
+    
+    override fun equals(other: Any?): Boolean = when (other) {
+        is AbstractGuavaMultimapWrapper<*, *> -> guavaMultimap == other.guavaMultimap
+        else                                  -> guavaMultimap == other
+    }
+    
+    override fun hashCode(): Int = guavaMultimap.hashCode()
+    
+    override fun spliterator(): Spliterator<Entry<K, @UnsafeVariance V>> = guavaMultimap.entries().spliterator()
+    
+    override fun iterator(): Iterator<Entry<K, V>> = guavaMultimap.entries().iterator()
+    
+    override fun toString(): String = guavaMultimap.toString()
 }
 
 internal abstract class AbstractMutableGuavaMultimapWrapper<K, V> : MutableMultimap<K, V>, AbstractGuavaMultimapWrapper<K, V>() {
@@ -59,6 +71,10 @@ internal abstract class AbstractMutableGuavaMultimapWrapper<K, V> : MutableMulti
     override fun get(key: K): MutableCollection<V> = guavaMultimap.get(key)
     
     override fun clear() = guavaMultimap.clear()
+    override val entries: MutableCollection<Entry<K, V>>
+        get() = guavaMultimap.entries()
+    
+    override fun iterator(): MutableIterator<Entry<K, V>> = guavaMultimap.entries().iterator()
     
     override fun remove(key: K, value: V): Boolean = guavaMultimap.remove(key, value)
     
@@ -66,10 +82,10 @@ internal abstract class AbstractMutableGuavaMultimapWrapper<K, V> : MutableMulti
     
     override fun removeAll(key: K): Collection<V> = guavaMultimap.removeAll(key)
     
-    override fun putAll(from: Multimap<out K, V>): Boolean {
+    override fun putAll(from: Multimap<K, V>): Boolean {
         var changed = false
-        for ((key, value) in from.entries) {
-            changed = changed or put(key, value)
+        for (key in from.keys) {
+            changed = putAll(key, from[key]) or changed
         }
         return changed
     }

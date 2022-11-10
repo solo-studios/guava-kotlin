@@ -16,7 +16,6 @@
 
 package ca.solostudios.guava.kotlin.collect
 
-import ca.solostudios.guava.kotlin.annotations.ExperimentalCollectionsApi
 import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.MultimapBuilder
 import com.google.common.collect.Multimaps
@@ -59,12 +58,14 @@ public fun <K, V> GuavaMultimap<K, V>.toKotlin(): MutableMultimap<K, V> {
  * @see GuavaMultimap
  * @see Multimap
  */
-@ExperimentalCollectionsApi
-@Suppress("UnstableApiUsage")
 public fun <K, V> Multimap<K, V>.toGuava(): ImmutableGuavaMultimap<K, V> {
     return when (this) {
         is AbstractGuavaMultimapWrapper -> ImmutableGuavaMultimap.copyOf(this.guavaMultimap)
-        else                            -> ImmutableGuavaMultimap.copyOf(this.entries)
+        else                            -> ImmutableGuavaMultimap.builder<K, V>().also {
+            for (key in this.keys) {
+                it.putAll(key, this[key])
+            }
+        }.build()
     }
 }
 
@@ -248,7 +249,7 @@ public interface Multimap<K, out V> : Iterable<Entry<K, V>> {
  * @see GuavaMultimap
  * @see MutableListMultimap
  */
-public interface MutableMultimap<K, V> : Multimap<K, V> {
+public interface MutableMultimap<K, V> : Multimap<K, V>, MutableIterable<Entry<K, V>> {
     // Modification Operations
     /**
      * Associates the specified [value] with the specified [key] in the map.
@@ -292,7 +293,7 @@ public interface MutableMultimap<K, V> : Multimap<K, V> {
      *
      * @see GuavaMultimap.putAll
      */
-    public fun putAll(from: Multimap<out K, V>): Boolean
+    public fun putAll(from: Multimap<K, V>): Boolean
     
     /**
      * Updates this map with key/value pair specified by [key] and [values].
@@ -321,6 +322,18 @@ public interface MutableMultimap<K, V> : Multimap<K, V> {
      * @see GuavaMultimap.get
      */
     public override operator fun get(key: K): MutableCollection<@UnsafeVariance V>
+    
+    /**
+     * Returns a read-write [Collection] of all key/value pairs in this map.
+     *
+     * Changes to the returned collection or the entries it contains will update the underlying
+     * multimap, and vice versa. However, *adding* to the returned collection is not possible.
+     *
+     * @see GuavaMultimap.entries
+     */
+    public override val entries: MutableCollection<Entry<K, V>>
+    
+    override fun iterator(): MutableIterator<Entry<K, V>> = entries.iterator()
 }
 
 internal class GuavaMultimapWrapper<K, out V>(

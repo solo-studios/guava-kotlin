@@ -18,7 +18,6 @@
 
 package ca.solostudios.guava.kotlin.collect
 
-import ca.solostudios.guava.kotlin.annotations.ExperimentalCollectionsApi
 import ca.solostudios.guava.kotlin.collect.MultimapKeyType.HASH_KEYS
 import ca.solostudios.guava.kotlin.collect.MultimapKeyType.LINKED_HASH_KEYS
 import ca.solostudios.guava.kotlin.collect.MultimapKeyType.TREE_KEYS
@@ -145,12 +144,14 @@ public fun <K, V> GuavaSetMultimap<K, V>.toKotlin(): MutableSetMultimap<K, V> {
  * @see GuavaSetMultimap
  * @see SetMultimap
  */
-@ExperimentalCollectionsApi
-@Suppress("UnstableApiUsage")
 public fun <K, V> SetMultimap<K, V>.toGuava(): ImmutableGuavaSetMultimap<K, V> {
     return when (this) {
         is GuavaSetMultimapWrapper -> ImmutableGuavaSetMultimap.copyOf(this.guavaMultimap)
-        else                       -> ImmutableGuavaSetMultimap.copyOf(this.entries)
+        else                       -> ImmutableGuavaSetMultimap.builder<K, V>().also {
+            for (key in this.keys) {
+                it.putAll(key, this[key])
+            }
+        }.build()
     }
 }
 
