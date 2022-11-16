@@ -29,7 +29,7 @@ import java.util.Collections
 import java.util.Enumeration
 
 /**
- * Returns an unmodifiable view of `iterator`.
+ * Returns an unmodifiable view of [this].
  *
  * @see Iterators.unmodifiableIterator
  */
@@ -38,14 +38,13 @@ public inline fun <T> MutableIterator<T>.unmodifiableIterator(): Iterator<T> {
 }
 
 /**
- * Returns the number of elements remaining in [this].
+ * Returns the number of elements remaining in `this`.
  * The iterator will be left exhausted: its [hasNext][Iterator.hasNext] method will return `false`.
  *
  * @see Iterators.size
  */
-public inline fun <T> Iterator<T>.size(): Int {
-    return Iterators.size(this)
-}
+public val Iterator<*>.size: Int
+    get() = Iterators.size(this)
 
 /**
  *  Returns `true` if [this] contains [element].
@@ -100,9 +99,9 @@ public inline fun <T> MutableIterator<T>.retainAll(elementsToRetain: Collection<
 
 /**
  * Determines whether two iterators contain equal elements in the same order. More specifically,
- * this method returns `true` if `iterator1` and `iterator2` contain the same
- * number of elements and every element of `iterator1` is equal to the corresponding element
- * of `iterator2`.
+ * this method returns `true` if [this] and [other] contain the same
+ * number of elements and every element of [this] is equal to the corresponding element
+ * of [other].
  *
  * Note that this will modify the supplied iterators, since they will have been advanced some
  * number of elements forward.
@@ -124,20 +123,6 @@ public inline fun <T> Iterator<T>.asString(): String {
 }
 
 /**
- * Returns the single element contained in [this].
- *
- * @throws NoSuchElementException If the iterator is empty and no default value is provided
- * @throws IllegalArgumentException If the iterator contains multiple elements.
- * The state of the iterator is unspecified.
- *
- * @see Iterators.getOnlyElement
- */
-@Throws(NoSuchElementException::class, IllegalArgumentException::class)
-public inline fun <T> Iterator<T>.getOnlyElement(defaultValue: T? = null): T {
-    return if (defaultValue == null) Iterators.getOnlyElement(this) else Iterators.getOnlyElement(this, defaultValue)
-}
-
-/**
  * Copies an iterator's elements into an array.
  * The iterator will be left exhausted: its [hasNext][Iterator.hasNext] method will return `false`.
  *
@@ -147,7 +132,7 @@ public inline fun <T> Iterator<T>.getOnlyElement(defaultValue: T? = null): T {
  *
  * @see Iterators.toArray
  */
-public inline fun <reified T> Iterator<T>.toArray(): Array<out T> {
+public inline fun <reified T> Iterator<T>.toTypedArray(): Array<out T> {
     return Iterators.toArray(this, T::class.java) as Array<out T>
 }
 
@@ -186,7 +171,7 @@ public inline fun <T> Iterator<T>.frequency(element: T): Int {
  *
  * @see Iterators.cycle
  */
-public inline fun <T> Iterable<T>.cycle(): Iterator<T> {
+public inline fun <T> Iterable<T>.cycleIterator(): Iterator<T> {
     return Iterators.cycle(this)
 }
 
@@ -206,7 +191,7 @@ public inline fun <T> Iterable<T>.cycle(): Iterator<T> {
  * @see Iterators.cycle
  */
 @JvmName("cycleMutable")
-public inline fun <T> MutableIterable<T>.cycle(): MutableIterator<T> {
+public inline fun <T> MutableIterable<T>.cycleIterator(): MutableIterator<T> {
     return Iterators.cycle(this)
 }
 
@@ -227,7 +212,7 @@ public inline fun <T> MutableIterable<T>.cycle(): MutableIterator<T> {
  *
  * @see Iterators.cycle
  */
-public inline fun <T> cycle(vararg elements: T): MutableIterator<T> {
+public inline fun <T> cycleIterator(vararg elements: T): MutableIterator<T> {
     return Iterators.cycle(*elements)
 }
 
@@ -259,7 +244,7 @@ public inline infix fun <T> MutableIterator<T>.concat(other: MutableIterator<T>)
 }
 
 /**
- * Combines two iterators into a single iterator. The returned iterator iterates across the
+ * Combines three iterators into a single iterator. The returned iterator iterates across the
  * elements in [this], followed by the elements in [a], followed by the elements in [b].
  * The source iterators are not polled until necessary.
  *
@@ -270,7 +255,7 @@ public inline fun <T> Iterator<T>.concat(a: Iterator<T>, b: Iterator<T>): Iterat
 }
 
 /**
- * Combines two iterators into a single iterator. The returned iterator iterates across the
+ * Combines three iterators into a single iterator. The returned iterator iterates across the
  * elements in [this], followed by the elements in [a], followed by the elements in [b].
  * The source iterators are not polled until necessary.
  *
@@ -330,7 +315,6 @@ public inline fun <T> Iterator<T>.concat(vararg iterators: Iterator<T>): Iterato
  * elements in [this], followed by the elements in [iterators] sequentially.
  * The source iterators are not polled until necessary.
  *
- *
  * The returned iterator supports [remove][MutableIterator.remove] when the corresponding input iterator
  * supports it.
  *
@@ -356,7 +340,6 @@ public inline fun <T> Iterator<Iterator<T>>.flatConcat(): Iterator<T> {
  * Combines two iterators into a single iterator. The returned iterator iterates across the
  * elements in [this] sequentially.
  * The source iterators are not polled until necessary.
- *
  *
  * The returned iterator supports [remove][MutableIterator.remove] when the corresponding input iterator
  * supports it.
@@ -384,7 +367,6 @@ public inline fun <T> Iterable<Iterator<T>>.flatConcat(): Iterator<T> {
  * elements in [this] sequentially.
  * The source iterators are not polled until necessary.
  *
- *
  * The returned iterator supports [remove][MutableIterator.remove] when the corresponding input iterator
  * supports it.
  *
@@ -410,7 +392,7 @@ public inline fun <T> concatNoDefensiveCopy(vararg inputs: Iterator<T>): Iterato
  * partition size of 3 yields `[[a, b, c], [d, e]]` -- an outer iterator containing two
  * inner lists of three and two elements, all in the original order.
  *
- * The returned lists implement [java.util.RandomAccess].
+ * The returned lists implement [RandomAccess].
  *
  * **Note:** The current implementation eagerly allocates storage for [size] elements.
  * As a consequence, passing values like [Int.MAX_VALUE] can lead to an [OutOfMemoryError].
@@ -420,7 +402,7 @@ public inline fun <T> concatNoDefensiveCopy(vararg inputs: Iterator<T>): Iterato
  * @return an iterator of immutable lists containing the elements of `iterator` divided into
  * partitions
  *
- * @throws IllegalArgumentException if `size` is non-positive
+ * @throws IllegalArgumentException if [size] is non-positive
  *
  * @see Iterators.partition
  */
@@ -460,7 +442,7 @@ public inline fun <T> Iterator<T>.paddedPartition(size: Int): Iterator<List<T?>>
  *
  * @see Iterators.filter
  */
-public inline fun <T> Iterator<T>.filter(noinline retainIfTrue: (T) -> Boolean): Iterator<T> {
+public inline fun <T> Iterator<T>.filterView(noinline retainIfTrue: (T) -> Boolean): Iterator<T> {
     return Iterators.filter(this, retainIfTrue)
 }
 
@@ -469,7 +451,7 @@ public inline fun <T> Iterator<T>.filter(noinline retainIfTrue: (T) -> Boolean):
  *
  * @see Iterators.filter
  */
-public inline fun <reified T> Iterator<*>.filter(): Iterator<T> {
+public inline fun <reified T> Iterator<*>.filterIsInstanceView(): Iterator<T> {
     return Iterators.filter(this, T::class.java)
 }
 
@@ -506,6 +488,7 @@ public inline fun <T> Iterator<T>.all(noinline predicate: (T) -> Boolean): Boole
  *
  * @see Iterators.find
  */
+@Throws(NoSuchElementException::class)
 public inline fun <T> Iterator<T>.find(defaultValue: T? = null, noinline predicate: (T) -> Boolean): T {
     return if (defaultValue == null) Iterators.find(this, predicate) else Iterators.find(this, predicate, defaultValue)!!
 }
@@ -569,6 +552,23 @@ public inline fun <F, T> MutableIterator<F>.transform(noinline function: (F) -> 
  * Advances [this]` `position + 1` times, returning the element at the [position]th position.
  *
  * @param position position of the element to return
+ *
+ * @return the element at the specified position in [this]
+ *
+ * @throws IndexOutOfBoundsException if [position] is negative or greater than or equal to
+ * the number of elements remaining in [this].
+ *
+ * @see Iterators.get
+ */
+@Throws(IndexOutOfBoundsException::class)
+public inline operator fun <T> Iterator<T>.get(position: Int): T {
+    return Iterators.get(this, position)
+}
+
+/**
+ * Advances [this]` `position + 1` times, returning the element at the [position]th position or a default value otherwise.
+ *
+ * @param position position of the element to return
  * @param defaultValue the default value to return if the iterator is empty or if [position]
  * is greater than the number of elements remaining in [this]
  *
@@ -580,6 +580,7 @@ public inline fun <F, T> MutableIterator<F>.transform(noinline function: (F) -> 
  *
  * @see Iterators.get
  */
+@Throws(IndexOutOfBoundsException::class)
 public inline fun <T> Iterator<T>.get(position: Int, defaultValue: T? = null): T {
     return if (defaultValue == null) Iterators.get(this, position) else Iterators.get(this, position, defaultValue)
 }
@@ -608,6 +609,7 @@ public inline fun <T> Iterator<T>.getNext(defaultValue: T): T {
  *
  * @see Iterators.getLast
  */
+@Throws(NoSuchElementException::class)
 public inline fun <T> Iterator<T>.getLast(defaultValue: T? = null): T {
     return if (defaultValue == null) Iterators.getLast(this) else Iterators.getLast(this, defaultValue)
 }
@@ -635,6 +637,7 @@ public inline fun <T> Iterator<T>.advance(numberToAdvance: Int): Int {
  *
  * @see Iterators.limit
  */
+@Throws(IllegalArgumentException::class)
 public inline fun <T> Iterator<T>.limit(limitSize: Int): Iterator<T> {
     return Iterators.limit(this, limitSize)
 }
@@ -651,6 +654,7 @@ public inline fun <T> Iterator<T>.limit(limitSize: Int): Iterator<T> {
  * @see Iterators.limit
  */
 @JvmName("limitMutable")
+@Throws(IllegalArgumentException::class)
 public inline fun <T> MutableIterator<T>.limit(limitSize: Int): MutableIterator<T> {
     return Iterators.limit(this, limitSize)
 }
@@ -786,7 +790,7 @@ public fun <T> Iterator<T>.peekingIterator(): PeekingIterator<T> {
  * returned first.
  */
 @ExperimentalCollectionsApi
-public inline fun <T, R : Comparable<R>> Iterable<MutableIterator<T>>.mergeSorted(crossinline selector: (T) -> Comparable<R>): Iterator<T> {
+public inline fun <T, R : Comparable<R>> Iterable<Iterator<T>>.mergeSorted(crossinline selector: (T) -> Comparable<R>): Iterator<T> {
     return this.mergeSorted(compareBy(selector))
 }
 
@@ -802,6 +806,6 @@ public inline fun <T, R : Comparable<R>> Iterable<MutableIterator<T>>.mergeSorte
  */
 @Suppress("UnstableApiUsage")
 @ExperimentalCollectionsApi
-public inline fun <T> Iterable<MutableIterator<T>>.mergeSorted(comparator: Comparator<T>): Iterator<T> {
+public inline fun <T> Iterable<Iterator<T>>.mergeSorted(comparator: Comparator<T>): Iterator<T> {
     return Iterators.mergeSorted(this, comparator)
 }

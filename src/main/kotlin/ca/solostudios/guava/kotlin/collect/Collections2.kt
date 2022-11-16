@@ -43,7 +43,7 @@ import com.google.common.collect.Iterables
  *
  * @see Collections2.filter
  */
-public inline fun <E> Collection<E>.filter(noinline predicate: (E) -> Boolean): Collection<E> {
+public inline fun <E> Collection<E>.filterView(noinline predicate: (E) -> Boolean): Collection<E> {
     return Collections2.filter(this, predicate)
 }
 
@@ -76,7 +76,7 @@ public inline fun <E> Collection<E>.filter(noinline predicate: (E) -> Boolean): 
  * @see Collections2.filter
  */
 @JvmName("filterMutable")
-public inline fun <E> MutableCollection<E>.filter(noinline predicate: (E) -> Boolean): MutableCollection<E> {
+public inline fun <E> MutableCollection<E>.filterView(noinline predicate: (E) -> Boolean): MutableCollection<E> {
     return Collections2.filter(this, predicate)
 }
 
