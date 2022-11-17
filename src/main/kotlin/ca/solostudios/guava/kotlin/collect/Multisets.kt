@@ -30,6 +30,7 @@ import com.google.common.collect.HashMultiset as GuavaHashMultiset
 import com.google.common.collect.ImmutableMultiset as ImmutableGuavaMultiset
 import com.google.common.collect.LinkedHashMultiset as GuavaLinkedHashMultiset
 import com.google.common.collect.Multiset as GuavaMultiset
+import com.google.common.collect.TreeMultiset as GuavaTreeMultiset
 
 /**
  * Wraps an immutable guava multiset into a [Multiset] instance.
@@ -89,20 +90,55 @@ public fun <E> MutableMultiset<E>.toGuava(): GuavaMultiset<E> {
     }
 }
 
+/**
+ * Returns a new [MutableMultiset] filled with all elements of this collection.
+ *
+ * @see GuavaHashMultiset.create
+ */
+
 public fun <E> Collection<E>.toMutableMultiset(): MutableMultiset<E> {
     return GuavaHashMultiset.create(this).toKotlin()
 }
 
+/**
+ * Returns a new [Multiset] filled with all elements of this collection.
+ *
+ * @see ImmutableMultiset.copyOf
+ */
 public fun <E> Collection<E>.toMultiset(): Multiset<E> {
     return ImmutableMultiset.copyOf(this).toKotlin()
 }
 
+/**
+ * Returns an unmodifiable view of the sum of two multisets. In the returned multiset, the count
+ * of each element is the *sum* of its counts in the two backing multisets. The iteration
+ * order of the returned multiset matches that of the element set of [this] followed by
+ * the members of the element set of [other] that are not contained in [other],
+ * with repeated occurrences of the same element appearing consecutively.
+ *
+ * Results are undefined if [this] and [other] are based on different
+ * equivalence relations (as [GuavaHashMultiset] and [GuavaTreeMultiset] are).
+ *
+ * @see Multisets.sum
+ */
 @ExperimentalGuavaCollectionsApi
 @Suppress("UnstableApiUsage")
 public operator fun <E> Multiset<E>.plus(other: Multiset<E>): Multiset<E> {
     return Multisets.sum(this.toGuava(), other.toGuava()).toKotlin()
 }
 
+/**
+ * Returns an unmodifiable view of the difference of two multisets. In the returned multiset, the
+ * count of each element is the result of the *zero-truncated subtraction* of its count in
+ * the second multiset from its count in the first multiset, with elements that would have a count
+ * of 0 not included. The iteration order of the returned multiset matches that of the element set
+ * of [this], with repeated occurrences of the same element appearing consecutively.
+ *
+ * Results are undefined if [this] and [other] are based on different
+ * equivalence relations (as [GuavaHashMultiset] and [GuavaTreeMultiset] are).
+ *
+ * @see Multisets.difference
+ */
 @ExperimentalGuavaCollectionsApi
 @Suppress("UnstableApiUsage")
 public operator fun <E> Multiset<E>.minus(other: Multiset<E>): Multiset<E> {

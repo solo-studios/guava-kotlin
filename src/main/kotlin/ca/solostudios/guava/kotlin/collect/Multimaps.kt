@@ -95,6 +95,24 @@ public fun <K, V> MutableMultimap<K, V>.toGuava(): GuavaMultimap<K, V> {
 }
 
 /**
+ * Returns a new [MutableMultimap] filled with all elements of this multimap.
+ *
+ * @see MultimapBuilder
+ */
+public fun <K, V> Multimap<K, V>.toMutableMultimap(): MutableMultimap<K, V> {
+    return MultimapBuilder.hashKeys().arrayListValues().build(this.toGuava()).toKotlin()
+}
+
+/**
+ * Returns a new [Multiset] filled with all elements of this multimap.
+ *
+ * @see ImmutableGuavaMultimap.copyOf
+ */
+public fun <K, V> Multimap<K, V>.toMultimap(): Multimap<K, V> {
+    return ImmutableGuavaMultimap.copyOf(this.toGuava()).toKotlin()
+}
+
+/**
  * The value collection type for a multimap.
  * Used by the [ListMultimap], and [SetMultimap] builder inference methods.
  *

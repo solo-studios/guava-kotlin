@@ -282,6 +282,24 @@ public inline fun <reified K : Enum<K>, V> buildMutableListMultimap(
 }
 
 /**
+ * Returns a new [MutableListMultimap] filled with all elements of this multimap.
+ *
+ * @see MultimapBuilder
+ */
+public fun <K, V> Multimap<K, V>.toMutableListMultimap(): MutableListMultimap<K, V> {
+    return MultimapBuilder.hashKeys().arrayListValues().build(this.toGuava()).toKotlin()
+}
+
+/**
+ * Returns a new [ListMultimap] filled with all elements of this multimap.
+ *
+ * @see ImmutableGuavaListMultimap.copyOf
+ */
+public fun <K, V> Multimap<K, V>.toListMultimap(): ListMultimap<K, V> {
+    return ImmutableGuavaListMultimap.copyOf(this.toGuava()).toKotlin()
+}
+
+/**
  * The list collection type for a multimap.
  * Used by the [ListMultimap] builder inference methods.
  *

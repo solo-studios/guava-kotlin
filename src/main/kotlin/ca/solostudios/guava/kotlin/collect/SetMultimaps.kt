@@ -349,6 +349,24 @@ public inline fun <reified K : Enum<K>, reified V : Enum<V>> buildMutableSetMult
 }
 
 /**
+ * Returns a new [MutableSetMultimap] filled with all elements of this multimap.
+ *
+ * @see MultimapBuilder
+ */
+public fun <K, V> Multimap<K, V>.toMutableSetMultimap(): MutableSetMultimap<K, V> {
+    return MultimapBuilder.hashKeys().hashSetValues().build(this.toGuava()).toKotlin()
+}
+
+/**
+ * Returns a new [SetMultimap] filled with all elements of this multimap.
+ *
+ * @see ImmutableGuavaSetMultimap.copyOf
+ */
+public fun <K, V> Multimap<K, V>.toSetMultimap(): SetMultimap<K, V> {
+    return ImmutableGuavaSetMultimap.copyOf(this.toGuava()).toKotlin()
+}
+
+/**
  * The set collection type for a multimap.
  * Used by the [SetMultimap] builder inference methods.
  *
