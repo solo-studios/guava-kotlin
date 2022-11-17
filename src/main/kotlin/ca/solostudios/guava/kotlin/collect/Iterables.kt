@@ -18,7 +18,7 @@
 
 package ca.solostudios.guava.kotlin.collect
 
-import ca.solostudios.guava.kotlin.annotations.ExperimentalCollectionsApi
+import ca.solostudios.guava.kotlin.annotations.ExperimentalGuavaCollectionsApi
 import com.google.common.base.Optional
 import com.google.common.collect.Iterables
 import com.google.common.collect.Iterators
@@ -741,7 +741,7 @@ public inline fun <T> Iterable<T>.isEmpty(): Boolean {
  * @see Iterables.mergeSorted
  */
 @Suppress("UnstableApiUsage")
-@OptIn(ExperimentalCollectionsApi::class)
+@OptIn(ExperimentalGuavaCollectionsApi::class)
 public inline fun <T, R : Comparable<R>> Iterable<Iterable<T>>.mergeSorted(crossinline selector: (T) -> Comparable<R>): Iterable<T> {
     return this.mergeSorted(compareBy(selector))
 }
@@ -759,7 +759,7 @@ public inline fun <T, R : Comparable<R>> Iterable<Iterable<T>>.mergeSorted(cross
  * @see Iterables.mergeSorted
  */
 @Suppress("UnstableApiUsage")
-@ExperimentalCollectionsApi
+@ExperimentalGuavaCollectionsApi
 public inline fun <T> Iterable<Iterable<T>>.mergeSorted(comparator: Comparator<T>): Iterable<T> {
     return Iterables.mergeSorted(this, comparator)
 }

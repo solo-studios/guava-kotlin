@@ -9,7 +9,7 @@ by providing a more idiomatic way to interact with it in Kotlin.
 
 Guava Kotlin is a bridge between Guava and common Kotlin language features and idioms.
 
-Please see the subpackages for further documentation on how it wraps Guava:
+Please see the subpackages for further documentation on how it wraps Guava.
 
 ## Setup with Gradle
 

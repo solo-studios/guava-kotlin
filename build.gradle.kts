@@ -77,6 +77,8 @@ dependencies {
     api(libs.bundles.kotlin)
     api(libs.guava)
     
+    compileOnly(libs.bundles.kotlinx.coroutines)
+    
     testImplementation(libs.bundles.junit)
     testImplementation(kotlin("test"))
     

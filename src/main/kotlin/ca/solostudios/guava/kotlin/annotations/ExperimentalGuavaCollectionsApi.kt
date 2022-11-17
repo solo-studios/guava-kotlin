@@ -37,13 +37,11 @@ import kotlin.annotation.AnnotationTarget.VALUE_PARAMETER
  *
  * Any public collections API annotated with this is either experimental, or depends on a guava api annotated with [Beta].
  *
- * Any usage of a declaration annotated with `@ExperimentalCollectionsApi` must be either accepted by
- * annotating that usage with the [OptIn] annotation, e.g. `@OptIn(ExperiemntalCollectionsApi::class)`,
- * or by using the compiler argument `-opt-in=ca.solostudios.guava.kotlin.annotations.ExperimentalCollectionsApi`
+ * Any usage of a declaration annotated with `@ExperimentalGuavaCollectionsApi` must be either accepted by
+ * annotating that usage with the [OptIn] annotation, e.g. `@OptIn(ExperimentalGuavaCollectionsApi::class)`,
+ * or by using the compiler argument `-opt-in=ca.solostudios.guava.kotlin.annotations.ExperimentalGuavaCollectionsApi`
  *
  * @see Beta
- *
- * @constructor Create empty Experimental collections api
  */
 @RequiresOptIn(level = RequiresOptIn.Level.WARNING)
 @Retention(AnnotationRetention.BINARY)
@@ -61,4 +59,4 @@ import kotlin.annotation.AnnotationTarget.VALUE_PARAMETER
         TYPEALIAS
        )
 @MustBeDocumented
-public annotation class ExperimentalCollectionsApi
+public annotation class ExperimentalGuavaCollectionsApi

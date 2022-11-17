@@ -1,5 +1,6 @@
 [versions]
 kotlin = "1.7.10"
+kotlinx-coroutines = "1.6.4"
 junit-jupiter = "5.9.1"
 
 [plugins]
@@ -24,6 +25,9 @@ kotlin-stdlib-jdk8 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk
 
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-jdk8 = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk8", version.ref = "kotlinx-coroutines" }
+
 # Guava
 ## A set of core Java libraries from Google that includes new collection types, immutable collections, a graph library,
 ##      and utilities for concurrency, I/O, hashing, caching, primitives, strings, and more
@@ -42,6 +46,11 @@ kotlin = [
     "kotlin-stdlib",
     "kotlin-stdlib-jdk7",
     "kotlin-stdlib-jdk8"
+]
+
+kotlinx-coroutines = [
+    "kotlinx-coroutines-core",
+    "kotlinx-coroutines-jdk8"
 ]
 
 junit = [

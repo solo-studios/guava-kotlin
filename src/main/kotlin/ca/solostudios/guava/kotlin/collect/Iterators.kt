@@ -18,7 +18,7 @@
 
 package ca.solostudios.guava.kotlin.collect
 
-import ca.solostudios.guava.kotlin.annotations.ExperimentalCollectionsApi
+import ca.solostudios.guava.kotlin.annotations.ExperimentalGuavaCollectionsApi
 import com.google.common.base.Optional
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterables
@@ -789,7 +789,7 @@ public fun <T> Iterator<T>.peekingIterator(): PeekingIterator<T> {
  * For any equivalent elements across all of [this], it is undefined which element is
  * returned first.
  */
-@ExperimentalCollectionsApi
+@ExperimentalGuavaCollectionsApi
 public inline fun <T, R : Comparable<R>> Iterable<Iterator<T>>.mergeSorted(crossinline selector: (T) -> Comparable<R>): Iterator<T> {
     return this.mergeSorted(compareBy(selector))
 }
@@ -805,7 +805,7 @@ public inline fun <T, R : Comparable<R>> Iterable<Iterator<T>>.mergeSorted(cross
  * returned first.
  */
 @Suppress("UnstableApiUsage")
-@ExperimentalCollectionsApi
+@ExperimentalGuavaCollectionsApi
 public inline fun <T> Iterable<Iterator<T>>.mergeSorted(comparator: Comparator<T>): Iterator<T> {
     return Iterators.mergeSorted(this, comparator)
 }

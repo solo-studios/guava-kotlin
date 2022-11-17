@@ -16,7 +16,7 @@
 
 package ca.solostudios.guava.kotlin.collect
 
-import ca.solostudios.guava.kotlin.annotations.ExperimentalCollectionsApi
+import ca.solostudios.guava.kotlin.annotations.ExperimentalGuavaCollectionsApi
 import ca.solostudios.guava.kotlin.collect.SetMultisetType.CONCURRENT_HASH_MULTISET
 import ca.solostudios.guava.kotlin.collect.SetMultisetType.HASH_MULTISET
 import ca.solostudios.guava.kotlin.collect.SetMultisetType.LINKED_HASH_MULTISET
@@ -97,13 +97,13 @@ public fun <E> Collection<E>.toMultiset(): Multiset<E> {
     return ImmutableMultiset.copyOf(this).toKotlin()
 }
 
-@ExperimentalCollectionsApi
+@ExperimentalGuavaCollectionsApi
 @Suppress("UnstableApiUsage")
 public operator fun <E> Multiset<E>.plus(other: Multiset<E>): Multiset<E> {
     return Multisets.sum(this.toGuava(), other.toGuava()).toKotlin()
 }
 
-@ExperimentalCollectionsApi
+@ExperimentalGuavaCollectionsApi
 @Suppress("UnstableApiUsage")
 public operator fun <E> Multiset<E>.minus(other: Multiset<E>): Multiset<E> {
     return Multisets.difference(this.toGuava(), other.toGuava()).toKotlin()

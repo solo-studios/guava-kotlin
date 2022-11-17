@@ -18,7 +18,7 @@
 
 package ca.solostudios.guava.kotlin.collect
 
-import ca.solostudios.guava.kotlin.annotations.ExperimentalCollectionsApi
+import ca.solostudios.guava.kotlin.annotations.ExperimentalGuavaCollectionsApi
 import com.google.common.base.Predicate
 import com.google.common.collect.Collections2
 import com.google.common.collect.Iterables
@@ -178,7 +178,7 @@ public inline fun <F, T> MutableCollection<F>.transform(noinline function: (F) -
  * @see Collections2.orderedPermutations
  * @see compareBy
  */
-@ExperimentalCollectionsApi
+@ExperimentalGuavaCollectionsApi
 @Suppress("UnstableApiUsage")
 public inline fun <E : Comparable<E>> Iterable<E>.orderedPermutations(): Collection<List<E>> {
     return Collections2.orderedPermutations(this, naturalOrder())
@@ -233,7 +233,7 @@ public inline fun <E : Comparable<E>> Iterable<E>.orderedPermutations(): Collect
  * @see Collections2.orderedPermutations
  * @see compareBy
  */
-@ExperimentalCollectionsApi
+@ExperimentalGuavaCollectionsApi
 @Suppress("UnstableApiUsage")
 public inline fun <E, R : Comparable<R>> Iterable<E>.orderedPermutations(crossinline selector: (E) -> Comparable<R>): Collection<List<E>> {
     return this.orderedPermutations(compareBy(selector))
@@ -287,7 +287,7 @@ public inline fun <E, R : Comparable<R>> Iterable<E>.orderedPermutations(crossin
  *
  * @see Collections2.orderedPermutations
  */
-@ExperimentalCollectionsApi
+@ExperimentalGuavaCollectionsApi
 @Suppress("UnstableApiUsage")
 public inline fun <E> Iterable<E>.orderedPermutations(comparator: Comparator<E>): Collection<List<E>> {
     return Collections2.orderedPermutations(this, comparator)
@@ -309,7 +309,7 @@ public inline fun <E> Iterable<E>.orderedPermutations(comparator: Comparator<E>)
  *
  * @see Collections2.permutations
  */
-@ExperimentalCollectionsApi
+@ExperimentalGuavaCollectionsApi
 @Suppress("UnstableApiUsage")
 public inline fun <reified E> Collection<E>.permutations(): Collection<List<E>> {
     return Collections2.permutations(this)

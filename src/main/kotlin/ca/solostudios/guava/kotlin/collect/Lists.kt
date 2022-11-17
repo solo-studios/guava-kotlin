@@ -18,7 +18,7 @@
 
 package ca.solostudios.guava.kotlin.collect
 
-import ca.solostudios.guava.kotlin.annotations.ExperimentalCollectionsApi
+import ca.solostudios.guava.kotlin.annotations.ExperimentalGuavaCollectionsApi
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Lists
 import java.util.stream.Stream
@@ -253,7 +253,7 @@ public fun String.charactersOf(): List<Char> {
  *
  * @see Lists.charactersOf
  */
-@ExperimentalCollectionsApi
+@ExperimentalGuavaCollectionsApi
 @Suppress("UnstableApiUsage")
 public fun CharSequence.charactersOf(): List<Char?>? {
     return Lists.charactersOf(this)
