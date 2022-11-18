@@ -48,7 +48,7 @@ plugins {
 }
 
 group = "ca.solo-studios"
-val versionObj = Version("0", "0", "1")
+val versionObj = Version("0", "1", "0")
 version = versionObj.toString()
 
 repositories {
@@ -59,9 +59,6 @@ kotlin {
     explicitApi()
     target {
         compilations.configureEach {
-            // allKotlinSourceSets.forEach {
-            //     it.languageSettings.optIn("")
-            // }
             kotlinOptions {
                 allWarningsAsErrors = true
                 jvmTarget = "1.8"
@@ -149,8 +146,8 @@ tasks {
             
             jdkVersion.set(8)
             reportUndocumented.set(true)
+    
             // Documentation link
-            
             sourceLink {
                 localDirectory.set(file("src/main/kotlin"))
                 remoteUrl.set(URL("https://github.com/solo-studios/guava-kotlin/tree/master/src/main/kotlin"))
