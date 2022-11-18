@@ -20,8 +20,105 @@ import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.MultimapBuilder
 import com.google.common.collect.Multimaps
 import kotlin.collections.Map.Entry
+import kotlin.experimental.ExperimentalTypeInference
 import com.google.common.collect.ImmutableMultimap as ImmutableGuavaMultimap
 import com.google.common.collect.Multimap as GuavaMultimap
+
+/**
+ * Returns an empty read-only [Multimap].
+ *
+ * Prefer [setMultimapOf] or [listMultimapOf] over this.
+ */
+public fun <K, V> emptyMultimap(): Multimap<K, V> = ImmutableGuavaMultimap.of<K, V>().toKotlin()
+
+/**
+ * Returns a new read-only [Multimap] of given elements.
+ *
+ * Prefer [setMultimapOf] or [listMultimapOf] over this.
+ */
+public fun <K, V> multimapOf(vararg elements: Pair<K, V>): Multimap<K, V> {
+    return if (elements.isNotEmpty())
+        ImmutableGuavaMultimap.builder<K, V>()
+                .also {
+                    for ((key, value) in elements)
+                        it.put(key, value)
+                }
+                .build()
+                .toKotlin()
+    else
+        emptyMultimap()
+}
+
+/**
+ * Returns a new read-only [Multimap] of given elements.
+ *
+ * Prefer [setMultimapOf] or [listMultimapOf] over this.
+ */
+@JvmName("multimapOfCollection")
+public fun <K, V> multimapOf(vararg elements: Pair<K, Collection<V>>): Multimap<K, V> {
+    return if (elements.isNotEmpty())
+        ImmutableGuavaMultimap.builder<K, V>()
+                .also {
+                    for ((key, value) in elements)
+                        it.putAll(key, value)
+                }
+                .build()
+                .toKotlin()
+    else
+        emptyMultimap()
+}
+
+/**
+ * Returns an empty read-only [Multimap].
+ *
+ * Prefer [setMultimapOf] or [listMultimapOf] over this.
+ */
+public fun <K, V> multimapOf(): Multimap<K, V> = emptyMultimap()
+
+/**
+ * Returns an empty new [Multimap].
+ *
+ * Prefer [mutableSetMultimapOf] or [mutableListMultimapOf] over this.
+ */
+public fun <K, V> mutableMultimapOf(): MutableMultimap<K, V> {
+    return MultimapBuilder.hashKeys()
+            .arrayListValues()
+            .build<K, V>()
+            .toKotlin()
+}
+
+/**
+ * Returns a new [Multimap] with the given elements.
+ *
+ * Prefer [mutableSetMultimapOf] or [mutableListMultimapOf] over this.
+ */
+public fun <K, V> mutableMultimapOf(vararg elements: Pair<K, V>): MutableMultimap<K, V> {
+    return MultimapBuilder.hashKeys()
+            .arrayListValues()
+            .build<K, V>()
+            .also {
+                for ((key, value) in elements)
+                    it.put(key, value)
+            }
+            .toKotlin()
+}
+
+/**
+ * Returns a new [MutableMultimap] with the given elements.
+ *
+ * Prefer [mutableSetMultimapOf] or [mutableListMultimapOf] over this.
+ */
+@JvmName("mutableMultimapOfCollection")
+public fun <K, V> mutableMultimapOf(vararg elements: Pair<K, Collection<V>>): MutableMultimap<K, V> {
+    return MultimapBuilder.hashKeys()
+            .arrayListValues()
+            .build<K, V>()
+            .also {
+                for ((key, value) in elements)
+                    it.putAll(key, value)
+            }
+            .toKotlin()
+}
 
 /**
  * Wraps an immutable guava multimap into a [Multimap] instance.
@@ -113,34 +210,54 @@ public fun <K, V> Multimap<K, V>.toMultimap(): Multimap<K, V> {
 }
 
 /**
- * The value collection type for a multimap.
- * Used by the [ListMultimap], and [SetMultimap] builder inference methods.
+ * Builds a new immutable multimap with the given [builderAction],
+ * using the builder inference api.
  *
- * @see buildMutableListMultimap
- * @see buildMutableSetMultimap
+ * Prefer [buildSetMultimap] or [buildListMultimap] over this.
+ *
+ * @param K The key type of the multimap.
+ * @param V The value type of the multimap.
+ *
+ * @param builderAction The builder action to apply to the multimap
+ *
+ * @return The newly created multimap.
+ *
+ * @see ImmutableGuavaMultimap.Builder
+ */
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <K, V> buildMultimap(
+    @BuilderInference builderAction: ImmutableGuavaMultimap.Builder<K, V>.() -> Unit,
+                                      ): Multimap<K, V> {
+    return ImmutableGuavaMultimap.builder<K, V>()
+            .apply(builderAction)
+            .build()
+            .toKotlin()
+}
+
+/**
+ * Builds a new mutable multimap with the given [builderAction],
+ * using the builder inference api.
+ *
+ * Prefer [buildSetMultimap] or [buildListMultimap] over this.
+ *
+ * @param K The key type of the multimap.
+ * @param V The value type of the multimap.
+ *
+ * @param builderAction The builder action to apply to the multimap
+ *
+ * @return The newly created multimap.
+ *
  * @see MultimapBuilder
  */
-public enum class MultimapKeyType {
-    /**
-     * Uses a backing tree map to store keys.
-     *
-     * @see MultimapBuilder.treeKeys
-     */
-    TREE_KEYS,
-    
-    /**
-     * Uses a backing hash map to store keys.
-     *
-     * @see MultimapBuilder.hashKeys
-     */
-    HASH_KEYS,
-    
-    /**
-     * Uses a backing linked hash map to store keys.
-     *
-     * @see MultimapBuilder.linkedHashKeys
-     */
-    LINKED_HASH_KEYS
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <K, V> buildMutableMultimap(
+    @BuilderInference builderAction: MutableMultimap<K, V>.() -> Unit,
+                                             ): MutableMultimap<K, V> {
+    return MultimapBuilder.hashKeys()
+            .arrayListValues()
+            .build<K, V>()
+            .toKotlin()
+            .apply(builderAction)
 }
 
 /**
@@ -151,6 +268,8 @@ public enum class MultimapKeyType {
  * read-write access is supported through the [MutableMultimap] interface.
  *
  * See the Guava User Guide article on [`Multimap`](https://github.com/google/guava/wiki/NewCollectionTypesExplained#multimap).
+ *
+ * Prefer [SetMultimap] or [ListMultimap] over this.
  *
  * @param K the type of multimap keys. The multimap is invariant in its key type, as it
  *          can accept key as a parameter (of [containsKey] for example) and return it in [keys] set.
@@ -259,6 +378,8 @@ public interface Multimap<K, out V> : Iterable<Entry<K, V>> {
  * Map keys are unique; the map holds only one value for each key.
  *
  * See the Guava User Guide article on [`Multimap`](https://github.com/google/guava/wiki/NewCollectionTypesExplained#multimap).
+ *
+ * Prefer [MutableSetMultimap] or [MutableListMultimap] over this.
  *
  * @param K the type of map keys. The map is invariant in its key type.
  * @param V the type of map values. The mutable map is invariant in its value type.

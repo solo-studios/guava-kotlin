@@ -140,7 +140,7 @@ public inline fun <B> List<List<B>>.cartesianProduct(): List<List<B>> {
  *
  * @see Lists.cartesianProduct
  */
-public inline fun <B> cartesianProductOf(vararg lists: List<B>): List<List<B>?>? {
+public inline fun <B> cartesianProductOf(vararg lists: List<B>): List<List<B>> {
     return Lists.cartesianProduct(*lists)
 }
 

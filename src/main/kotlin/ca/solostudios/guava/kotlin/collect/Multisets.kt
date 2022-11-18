@@ -20,8 +20,10 @@ import ca.solostudios.guava.kotlin.annotations.ExperimentalGuavaCollectionsApi
 import ca.solostudios.guava.kotlin.collect.SetMultisetType.CONCURRENT_HASH_MULTISET
 import ca.solostudios.guava.kotlin.collect.SetMultisetType.HASH_MULTISET
 import ca.solostudios.guava.kotlin.collect.SetMultisetType.LINKED_HASH_MULTISET
+import com.google.common.collect.HashMultiset
 import com.google.common.collect.ImmutableMultiset
 import com.google.common.collect.Iterables
+import com.google.common.collect.Multiset.Entry
 import com.google.common.collect.Multisets
 import java.util.Collections
 import kotlin.experimental.ExperimentalTypeInference
@@ -31,6 +33,40 @@ import com.google.common.collect.ImmutableMultiset as ImmutableGuavaMultiset
 import com.google.common.collect.LinkedHashMultiset as GuavaLinkedHashMultiset
 import com.google.common.collect.Multiset as GuavaMultiset
 import com.google.common.collect.TreeMultiset as GuavaTreeMultiset
+
+/**
+ * Returns an empty read-only [Multiset].
+ */
+public fun <T> emptyMultiset(): Multiset<T> = ImmutableGuavaMultiset.of<T>().toKotlin()
+
+/**
+ * Returns a new read-only [Multiset] of given elements.
+ */
+public fun <T> multisetOf(vararg elements: T): Multiset<T> {
+    return if (elements.isNotEmpty())
+        ImmutableGuavaMultiset.copyOf(elements)
+                .toKotlin()
+    else
+        emptyMultiset()
+}
+
+/**
+ * Returns an empty read-only [Multiset].
+ */
+public fun <T> multisetOf(): Multiset<T> = emptyMultiset()
+
+/**
+ * Returns an empty new [MutableMultiset].
+ */
+public fun <T> mutableMultisetOf(): MutableMultiset<T> = HashMultiset.create<T>().toKotlin()
+
+/**
+ * Returns a new [MutableMultiset] with the given elements.
+ */
+public fun <T> mutableMultisetOf(vararg elements: T): MutableMultiset<T> {
+    return HashMultiset.create(elements.toList())
+            .toKotlin()
+}
 
 /**
  * Wraps an immutable guava multiset into a [Multiset] instance.
@@ -294,7 +330,7 @@ public interface Multiset<out E> : Collection<E> {
      *
      * @see GuavaMultiset.entrySet
      */
-    public val entrySet: Set<GuavaMultiset.Entry<@UnsafeVariance E>>
+    public val entrySet: Set<Entry<@UnsafeVariance E>>
 }
 
 /**

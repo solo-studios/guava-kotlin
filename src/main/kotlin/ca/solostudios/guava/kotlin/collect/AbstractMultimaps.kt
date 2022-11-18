@@ -51,16 +51,16 @@ internal abstract class AbstractGuavaMultimapWrapper<K, out V> : Multimap<K, V> 
     override val entries: Collection<Entry<K, V>>
         get() = guavaMultimap.entries()
     
+    override fun spliterator(): Spliterator<Entry<K, @UnsafeVariance V>> = guavaMultimap.entries().spliterator()
+    
+    override fun iterator(): Iterator<Entry<K, V>> = guavaMultimap.entries().iterator()
+    
     override fun equals(other: Any?): Boolean = when (other) {
         is AbstractGuavaMultimapWrapper<*, *> -> guavaMultimap == other.guavaMultimap
         else                                  -> guavaMultimap == other
     }
     
     override fun hashCode(): Int = guavaMultimap.hashCode()
-    
-    override fun spliterator(): Spliterator<Entry<K, @UnsafeVariance V>> = guavaMultimap.entries().spliterator()
-    
-    override fun iterator(): Iterator<Entry<K, V>> = guavaMultimap.entries().iterator()
     
     override fun toString(): String = guavaMultimap.toString()
 }

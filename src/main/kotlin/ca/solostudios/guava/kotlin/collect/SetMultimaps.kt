@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-@file:Suppress("NOTHING_TO_INLINE")
-
 package ca.solostudios.guava.kotlin.collect
 
-import ca.solostudios.guava.kotlin.collect.MultimapKeyType.HASH_KEYS
-import ca.solostudios.guava.kotlin.collect.MultimapKeyType.LINKED_HASH_KEYS
-import ca.solostudios.guava.kotlin.collect.MultimapKeyType.TREE_KEYS
-import ca.solostudios.guava.kotlin.collect.SetMultimapValueType.HASH_SET
-import ca.solostudios.guava.kotlin.collect.SetMultimapValueType.LINKED_HASH_SET
-import ca.solostudios.guava.kotlin.collect.SetMultimapValueType.TREE_SET
-import com.google.common.collect.HashMultimap
 import com.google.common.collect.MultimapBuilder
-import com.google.common.collect.MultimapBuilder.SetMultimapBuilder
 import com.google.common.collect.Multimaps
 import kotlin.experimental.ExperimentalTypeInference
 import com.google.common.collect.ImmutableSetMultimap as ImmutableGuavaSetMultimap
@@ -35,12 +25,12 @@ import com.google.common.collect.SetMultimap as GuavaSetMultimap
 /**
  * Returns an empty read-only [SetMultimap].
  */
-public inline fun <K, V> emptySetMultimap(): SetMultimap<K, V> = ImmutableGuavaSetMultimap.of<K, V>().toKotlin()
+public fun <K, V> emptySetMultimap(): SetMultimap<K, V> = ImmutableGuavaSetMultimap.of<K, V>().toKotlin()
 
 /**
  * Returns a new read-only [SetMultimap] of given elements.
  */
-public inline fun <K, V> setMultimapOf(vararg elements: Pair<K, V>): SetMultimap<K, V> {
+public fun <K, V> setMultimapOf(vararg elements: Pair<K, V>): SetMultimap<K, V> {
     return if (elements.isNotEmpty())
         ImmutableGuavaSetMultimap.builder<K, V>()
                 .also {
@@ -57,7 +47,7 @@ public inline fun <K, V> setMultimapOf(vararg elements: Pair<K, V>): SetMultimap
  * Returns a new read-only [SetMultimap] of given elements.
  */
 @JvmName("setMultimapOfCollection")
-public inline fun <K, V> setMultimapOf(vararg elements: Pair<K, Collection<V>>): SetMultimap<K, V> {
+public fun <K, V> setMultimapOf(vararg elements: Pair<K, Collection<V>>): SetMultimap<K, V> {
     return if (elements.isNotEmpty())
         ImmutableGuavaSetMultimap.builder<K, V>()
                 .also {
@@ -73,17 +63,22 @@ public inline fun <K, V> setMultimapOf(vararg elements: Pair<K, Collection<V>>):
 /**
  * Returns an empty read-only [SetMultimap].
  */
-public inline fun <K, V> setMultimapOf(): SetMultimap<K, V> = emptySetMultimap()
+public fun <K, V> setMultimapOf(): SetMultimap<K, V> = emptySetMultimap()
 
 /**
  * Returns an empty new [MutableMultimap].
  */
-public inline fun <K, V> mutableSetMultimapOf(): SetMultimap<K, V> = HashMultimap.create<K, V>().toKotlin()
+public fun <K, V> mutableSetMultimapOf(): MutableSetMultimap<K, V> {
+    return MultimapBuilder.hashKeys()
+            .hashSetValues()
+            .build<K, V>()
+            .toKotlin()
+}
 
 /**
  * Returns a new [MutableMultimap] with the given elements.
  */
-public inline fun <K, V> mutableSetMultimapOf(vararg elements: Pair<K, V>): SetMultimap<K, V> {
+public fun <K, V> mutableSetMultimapOf(vararg elements: Pair<K, V>): MutableSetMultimap<K, V> {
     return MultimapBuilder.hashKeys()
             .hashSetValues()
             .build<K, V>()
@@ -98,7 +93,7 @@ public inline fun <K, V> mutableSetMultimapOf(vararg elements: Pair<K, V>): SetM
  * Returns a new [MutableMultimap] with the given elements.
  */
 @JvmName("mutableSetMultimapOfCollection")
-public inline fun <K, V> mutableSetMultimapOf(vararg elements: Pair<K, Collection<V>>): MutableSetMultimap<K, V> {
+public fun <K, V> mutableSetMultimapOf(vararg elements: Pair<K, Collection<V>>): MutableSetMultimap<K, V> {
     return MultimapBuilder.hashKeys()
             .hashSetValues()
             .build<K, V>()
@@ -166,8 +161,10 @@ public fun <K, V> SetMultimap<K, V>.toGuava(): ImmutableGuavaSetMultimap<K, V> {
  */
 public fun <K, V> MutableSetMultimap<K, V>.toGuava(): GuavaSetMultimap<K, V> {
     return when (this) {
-        is MutableGuavaSetMultimapWrapper -> MultimapBuilder.hashKeys().hashSetValues().build(this.guavaMultimap)
-        
+        is MutableGuavaSetMultimapWrapper -> MultimapBuilder.hashKeys()
+                .hashSetValues()
+                .build(this.guavaMultimap)
+    
         else                              -> {
             MultimapBuilder.hashKeys()
                     .hashSetValues()
@@ -181,6 +178,27 @@ public fun <K, V> MutableSetMultimap<K, V>.toGuava(): GuavaSetMultimap<K, V> {
 }
 
 /**
+ * Returns a new [MutableSetMultimap] filled with all elements of this multimap.
+ *
+ * @see MultimapBuilder
+ */
+public fun <K, V> Multimap<K, V>.toMutableSetMultimap(): MutableSetMultimap<K, V> {
+    return MultimapBuilder.hashKeys()
+            .hashSetValues()
+            .build(this.toGuava())
+            .toKotlin()
+}
+
+/**
+ * Returns a new [SetMultimap] filled with all elements of this multimap.
+ *
+ * @see ImmutableGuavaSetMultimap.copyOf
+ */
+public fun <K, V> Multimap<K, V>.toSetMultimap(): SetMultimap<K, V> {
+    return ImmutableGuavaSetMultimap.copyOf(this.toGuava()).toKotlin()
+}
+
+/**
  * Builds a new immutable set-multimap with the given [builderAction],
  * using the builder inference api.
  *
@@ -188,8 +206,6 @@ public fun <K, V> MutableSetMultimap<K, V>.toGuava(): GuavaSetMultimap<K, V> {
  * @param V The value type of the set-multimap.
  *
  * @param builderAction The builder action to apply to the set-multimap
- *
- * @receiver A builder action applied to immutable set-multimap builder.
  *
  * @return The newly created set-multimap.
  *
@@ -207,16 +223,12 @@ public inline fun <K, V> buildSetMultimap(
 
 /**
  * Builds a new mutable set-multimap with the given [builderAction],
- * using the builder inference api, that is always backed by an enum map.
+ * using the builder inference api.
  *
- * @param K The key type of the set-multimap. Must be an enum.
+ * @param K The key type of the set-multimap.
  * @param V The value type of the set-multimap.
  *
- * @param keyType The backing collection type used for the set-multimap base map.
- * @param valueType The backing collection type used for the set-multimap values.
  * @param builderAction The builder action to apply to the set-multimap
- *
- * @receiver A builder action applied to the returned set-multimap.
  *
  * @return The newly created set-multimap.
  *
@@ -224,176 +236,13 @@ public inline fun <K, V> buildSetMultimap(
  */
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <K, V> buildMutableSetMultimap(
-    keyType: MultimapKeyType = HASH_KEYS,
-    valueType: SetMultimapValueType = HASH_SET,
     @BuilderInference builderAction: MutableSetMultimap<K, V>.() -> Unit,
                                                 ): MutableSetMultimap<K, V> {
-    
-    val multimapBuilderWithKeys = when (keyType) {
-        TREE_KEYS        -> MultimapBuilder.treeKeys()
-        HASH_KEYS        -> MultimapBuilder.hashKeys()
-        LINKED_HASH_KEYS -> MultimapBuilder.linkedHashKeys()
-    }
-    
-    @Suppress("UNCHECKED_CAST")
-    val multimapBuilder = multimapBuilderWithKeys.run {
-        when (valueType) {
-            HASH_SET        -> hashSetValues()
-            LINKED_HASH_SET -> linkedHashSetValues()
-            TREE_SET        -> treeSetValues()
-        } as SetMultimapBuilder<K, V>
-    }
-    
-    
-    
-    return multimapBuilder.build<K, V>()
+    return MultimapBuilder.hashKeys()
+            .hashSetValues()
+            .build<K, V>()
             .toKotlin()
             .apply(builderAction)
-}
-
-/**
- * Builds a new mutable set-multimap with the given [builderAction],
- * using the builder inference api, that is always backed by an enum map.
- *
- * @param K The key type of the set-multimap. Must be an enum.
- * @param V The value type of the set-multimap.
- *
- * @param valueType The backing collection type used for the set-multimap values.
- * @param builderAction The builder action to apply to the set-multimap
- *
- * @receiver A builder action applied to the returned set-multimap.
- *
- * @return The newly created set-multimap.
- *
- * @see MultimapBuilder
- */
-@OptIn(ExperimentalTypeInference::class)
-public inline fun <reified K : Enum<K>, V> buildMutableSetMultimap(
-    valueType: SetMultimapValueType = HASH_SET,
-    @BuilderInference builderAction: MutableSetMultimap<K, V>.() -> Unit,
-                                                                  ): MutableSetMultimap<K, V> {
-    @Suppress("UNCHECKED_CAST")
-    val multimapBuilder = MultimapBuilder.enumKeys(K::class.java).run {
-        when (valueType) {
-            HASH_SET        -> hashSetValues()
-            LINKED_HASH_SET -> linkedHashSetValues()
-            TREE_SET        -> treeSetValues()
-        } as SetMultimapBuilder<K, V>
-    }
-    return multimapBuilder.build<K, V>()
-            .toKotlin()
-            .apply(builderAction)
-}
-
-/**
- * Builds a new mutable set-multimap with the given [builderAction],
- * using the builder inference api, that is always backed by enum set values.
- *
- * @param K The key type of the set-multimap.
- * @param V The value type of the set-multimap. Must be an enum.
- *
- * @param keyType The backing collection type used for the set-multimap base map.
- * @param builderAction The builder action to apply to the set-multimap
- *
- * @receiver A builder action applied to the returned set-multimap.
- *
- * @return The newly created set-multimap.
- *
- * @see MultimapBuilder
- */
-@OptIn(ExperimentalTypeInference::class)
-public inline fun <K, reified V : Enum<V>> buildMutableSetMultimap(
-    keyType: MultimapKeyType = HASH_KEYS,
-    @BuilderInference builderAction: MutableSetMultimap<K, V>.() -> Unit,
-                                                                  ): MutableSetMultimap<K, V> {
-    
-    val multimapBuilderWithKeys = when (keyType) {
-        TREE_KEYS        -> MultimapBuilder.treeKeys()
-        HASH_KEYS        -> MultimapBuilder.hashKeys()
-        LINKED_HASH_KEYS -> MultimapBuilder.linkedHashKeys()
-    }
-    
-    @Suppress("UNCHECKED_CAST")
-    val multimapBuilder = multimapBuilderWithKeys.enumSetValues(V::class.java) as SetMultimapBuilder<K, V>
-    
-    return multimapBuilder.build<K, V>()
-            .toKotlin()
-            .apply(builderAction)
-}
-
-/**
- * Builds a new mutable set-multimap with the given [builderAction],
- * using the builder inference api, that is always backed by an enum map,
- * and an enum set for the values.
- *
- * @param K The key type of the set-multimap. Must be an enum.
- * @param V The value type of the set-multimap. Must be an enum.
- *
- * @param builderAction The builder action to apply to the set-multimap
- *
- * @receiver A builder action applied to the returned set-multimap.
- *
- * @return The newly created set-multimap.
- *
- * @see MultimapBuilder
- */
-@OptIn(ExperimentalTypeInference::class)
-public inline fun <reified K : Enum<K>, reified V : Enum<V>> buildMutableSetMultimap(
-    @BuilderInference builderAction: MutableSetMultimap<K, V>.() -> Unit,
-                                                                                    ): MutableSetMultimap<K, V> {
-    return MultimapBuilder.enumKeys(K::class.java)
-            .enumSetValues(V::class.java)
-            .build()
-            .toKotlin()
-            .apply(builderAction)
-}
-
-/**
- * Returns a new [MutableSetMultimap] filled with all elements of this multimap.
- *
- * @see MultimapBuilder
- */
-public fun <K, V> Multimap<K, V>.toMutableSetMultimap(): MutableSetMultimap<K, V> {
-    return MultimapBuilder.hashKeys().hashSetValues().build(this.toGuava()).toKotlin()
-}
-
-/**
- * Returns a new [SetMultimap] filled with all elements of this multimap.
- *
- * @see ImmutableGuavaSetMultimap.copyOf
- */
-public fun <K, V> Multimap<K, V>.toSetMultimap(): SetMultimap<K, V> {
-    return ImmutableGuavaSetMultimap.copyOf(this.toGuava()).toKotlin()
-}
-
-/**
- * The set collection type for a multimap.
- * Used by the [SetMultimap] builder inference methods.
- *
- * @see buildMutableSetMultimap
- * @see MultimapBuilder
- */
-public enum class SetMultimapValueType {
-    /**
-     * Uses a backing hash set to store values.
-     *
-     * @see MultimapBuilder.MultimapBuilderWithKeys.hashSetValues
-     */
-    HASH_SET,
-    
-    /**
-     * Uses a backing linked hash set to store values.
-     *
-     * @see MultimapBuilder.MultimapBuilderWithKeys.linkedHashSetValues
-     */
-    LINKED_HASH_SET,
-    
-    /**
-     * Uses a backing tree set to store values.
-     *
-     * @see MultimapBuilder.MultimapBuilderWithKeys.treeSetValues
-     */
-    TREE_SET
 }
 
 /**

@@ -14,20 +14,11 @@
  * limitations under the License.
  */
 
-@file:Suppress("NOTHING_TO_INLINE")
-
 package ca.solostudios.guava.kotlin.collect
 
-import ca.solostudios.guava.kotlin.collect.ListMultimapValueType.ARRAY_LIST
-import ca.solostudios.guava.kotlin.collect.ListMultimapValueType.LINKED_LIST
-import ca.solostudios.guava.kotlin.collect.MultimapKeyType.HASH_KEYS
-import ca.solostudios.guava.kotlin.collect.MultimapKeyType.LINKED_HASH_KEYS
-import ca.solostudios.guava.kotlin.collect.MultimapKeyType.TREE_KEYS
 import com.google.common.collect.MultimapBuilder
-import com.google.common.collect.MultimapBuilder.ListMultimapBuilder
 import com.google.common.collect.Multimaps
 import kotlin.experimental.ExperimentalTypeInference
-import com.google.common.collect.ArrayListMultimap as GuavaArrayListMultimap
 import com.google.common.collect.ImmutableListMultimap as ImmutableGuavaListMultimap
 import com.google.common.collect.ListMultimap as GuavaListMultimap
 import com.google.common.collect.MultimapBuilder as GuavaMultimapBuilder
@@ -35,12 +26,12 @@ import com.google.common.collect.MultimapBuilder as GuavaMultimapBuilder
 /**
  * Returns an empty read-only [ListMultimap].
  */
-public inline fun <K, V> emptyListMultimap(): ListMultimap<K, V> = ImmutableGuavaListMultimap.of<K, V>().toKotlin()
+public fun <K, V> emptyListMultimap(): ListMultimap<K, V> = ImmutableGuavaListMultimap.of<K, V>().toKotlin()
 
 /**
  * Returns a new read-only [ListMultimap] of given elements.
  */
-public inline fun <K, V> listMultimapOf(vararg elements: Pair<K, V>): ListMultimap<K, V> {
+public fun <K, V> listMultimapOf(vararg elements: Pair<K, V>): ListMultimap<K, V> {
     return if (elements.isNotEmpty())
         ImmutableGuavaListMultimap.builder<K, V>()
                 .also {
@@ -57,7 +48,7 @@ public inline fun <K, V> listMultimapOf(vararg elements: Pair<K, V>): ListMultim
  * Returns a new read-only [ListMultimap] of given elements.
  */
 @JvmName("listMultimapOfCollection")
-public inline fun <K, V> listMultimapOf(vararg elements: Pair<K, Collection<V>>): ListMultimap<K, V> {
+public fun <K, V> listMultimapOf(vararg elements: Pair<K, Collection<V>>): ListMultimap<K, V> {
     return if (elements.isNotEmpty())
         ImmutableGuavaListMultimap.builder<K, V>()
                 .also {
@@ -73,17 +64,22 @@ public inline fun <K, V> listMultimapOf(vararg elements: Pair<K, Collection<V>>)
 /**
  * Returns an empty read-only [ListMultimap].
  */
-public inline fun <K, V> listMultimapOf(): ListMultimap<K, V> = emptyListMultimap()
+public fun <K, V> listMultimapOf(): ListMultimap<K, V> = emptyListMultimap()
 
 /**
- * Returns an empty new [ListMultimap].
+ * Returns an empty new [MutableListMultimap].
  */
-public inline fun <K, V> mutableListMultimapOf(): ListMultimap<K, V> = GuavaArrayListMultimap.create<K, V>().toKotlin()
+public fun <K, V> mutableListMultimapOf(): MutableListMultimap<K, V> {
+    return MultimapBuilder.hashKeys()
+            .arrayListValues()
+            .build<K, V>()
+            .toKotlin()
+}
 
 /**
- * Returns a new [ListMultimap] with the given elements.
+ * Returns a new [MutableListMultimap] with the given elements.
  */
-public inline fun <K, V> mutableListMultimapOf(vararg elements: Pair<K, V>): ListMultimap<K, V> {
+public fun <K, V> mutableListMultimapOf(vararg elements: Pair<K, V>): MutableListMultimap<K, V> {
     return GuavaMultimapBuilder.hashKeys()
             .arrayListValues()
             .build<K, V>()
@@ -95,10 +91,10 @@ public inline fun <K, V> mutableListMultimapOf(vararg elements: Pair<K, V>): Lis
 }
 
 /**
- * Returns a new [ListMultimap] with the given elements.
+ * Returns a new [MutableListMultimap] with the given elements.
  */
 @JvmName("mutableListMultimapOfCollection")
-public inline fun <K, V> mutableListMultimapOf(vararg elements: Pair<K, Collection<V>>): MutableListMultimap<K, V> {
+public fun <K, V> mutableListMultimapOf(vararg elements: Pair<K, Collection<V>>): MutableListMultimap<K, V> {
     return GuavaMultimapBuilder.hashKeys()
             .arrayListValues()
             .build<K, V>()
@@ -147,11 +143,16 @@ public fun <K, V> GuavaListMultimap<K, V>.toKotlin(): MutableListMultimap<K, V> 
 public fun <K, V> ListMultimap<K, V>.toGuava(): ImmutableGuavaListMultimap<K, V> {
     return when (this) {
         is GuavaListMultimapWrapper -> ImmutableGuavaListMultimap.copyOf(this.guavaMultimap)
-        else                        -> ImmutableGuavaListMultimap.builder<K, V>().also {
-            for (key in this.keys) {
-                it.putAll(key, this[key])
-            }
-        }.build()
+    
+        else                        -> {
+            ImmutableGuavaListMultimap.builder<K, V>()
+                    .also {
+                        for (key in this.keys) {
+                            it.putAll(key, this[key])
+                        }
+                    }
+                    .build()
+        }
     }
 }
 
@@ -166,8 +167,12 @@ public fun <K, V> ListMultimap<K, V>.toGuava(): ImmutableGuavaListMultimap<K, V>
  */
 public fun <K, V> MutableListMultimap<K, V>.toGuava(): GuavaListMultimap<K, V> {
     return when (this) {
-        is MutableGuavaListMultimapWrapper -> GuavaMultimapBuilder.hashKeys().arrayListValues().build(this.guavaMultimap)
-        
+        is MutableGuavaListMultimapWrapper -> {
+            GuavaMultimapBuilder.hashKeys()
+                    .arrayListValues()
+                    .build(this.guavaMultimap)
+        }
+    
         else                               -> {
             GuavaMultimapBuilder.hashKeys()
                     .arrayListValues()
@@ -181,15 +186,31 @@ public fun <K, V> MutableListMultimap<K, V>.toGuava(): GuavaListMultimap<K, V> {
 }
 
 /**
+ * Returns a new [MutableListMultimap] filled with all elements of this multimap.
+ *
+ * @see MultimapBuilder
+ */
+public fun <K, V> Multimap<K, V>.toMutableListMultimap(): MutableListMultimap<K, V> {
+    return MultimapBuilder.hashKeys().arrayListValues().build(this.toGuava()).toKotlin()
+}
+
+/**
+ * Returns a new [ListMultimap] filled with all elements of this multimap.
+ *
+ * @see ImmutableGuavaListMultimap.copyOf
+ */
+public fun <K, V> Multimap<K, V>.toListMultimap(): ListMultimap<K, V> {
+    return ImmutableGuavaListMultimap.copyOf(this.toGuava()).toKotlin()
+}
+
+/**
  * Builds a new immutable list-multimap with the given [builderAction],
  * using the builder inference api.
  *
- * @param K The key type of the list-multimap. Must be an enum.
+ * @param K The key type of the list-multimap.
  * @param V The value type of the list-multimap.
  *
  * @param builderAction The builder action to apply to the list-multimap
- *
- * @receiver A builder action applied to immutable list-multimap builder.
  *
  * @return The newly created list-multimap.
  *
@@ -212,11 +233,7 @@ public inline fun <K, V> buildListMultimap(
  * @param K The key type of the list-multimap.
  * @param V The value type of the list-multimap.
  *
- * @param keyType The backing collection type used for the list-multimap base map.
- * @param valueType The backing collection type used for the list-multimap values.
  * @param builderAction The builder action to apply to the list-multimap
- *
- * @receiver A builder action applied to the returned list-multimap.
  *
  * @return The newly created list-multimap.
  *
@@ -224,102 +241,13 @@ public inline fun <K, V> buildListMultimap(
  */
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <K, V> buildMutableListMultimap(
-    keyType: MultimapKeyType = HASH_KEYS,
-    valueType: ListMultimapValueType = ARRAY_LIST,
     @BuilderInference builderAction: MutableListMultimap<K, V>.() -> Unit,
                                                  ): MutableListMultimap<K, V> {
-    
-    val multimapBuilderWithKeys = when (keyType) {
-        TREE_KEYS        -> MultimapBuilder.treeKeys()
-        HASH_KEYS        -> MultimapBuilder.hashKeys()
-        LINKED_HASH_KEYS -> MultimapBuilder.linkedHashKeys()
-    }
-    
-    @Suppress("UNCHECKED_CAST")
-    val multimapBuilder = multimapBuilderWithKeys.run {
-        when (valueType) {
-            ARRAY_LIST  -> arrayListValues()
-            LINKED_LIST -> linkedListValues()
-        } as ListMultimapBuilder<K, V>
-    }
-    
-    
-    
-    return multimapBuilder.build<K, V>()
+    return MultimapBuilder.hashKeys()
+            .arrayListValues()
+            .build<K, V>()
             .toKotlin()
             .apply(builderAction)
-}
-
-/**
- * Builds a new mutable list-multimap with the given [builderAction],
- * using the builder inference api, that is always backed by an enum map.
- *
- * @param K The key type of the list-multimap. Must be an enum.
- * @param V The value type of the list-multimap.
- *
- * @param valueType The backing collection type used for the list-multimap values.
- * @param builderAction The builder action to apply to the list-multimap
- *
- * @receiver A builder action applied to the returned list-multimap.
- * @return The newly created list-multimap.
- *
- * @see MultimapBuilder
- */
-@OptIn(ExperimentalTypeInference::class)
-public inline fun <reified K : Enum<K>, V> buildMutableListMultimap(
-    valueType: ListMultimapValueType = ARRAY_LIST,
-    @BuilderInference builderAction: MutableListMultimap<K, V>.() -> Unit,
-                                                                   ): MutableListMultimap<K, V> {
-    val multimapBuilder = MultimapBuilder.enumKeys(K::class.java).run {
-        when (valueType) {
-            ARRAY_LIST  -> arrayListValues()
-            LINKED_LIST -> linkedListValues()
-        }
-    }
-    return multimapBuilder.build<K, V>()
-            .toKotlin()
-            .apply(builderAction)
-}
-
-/**
- * Returns a new [MutableListMultimap] filled with all elements of this multimap.
- *
- * @see MultimapBuilder
- */
-public fun <K, V> Multimap<K, V>.toMutableListMultimap(): MutableListMultimap<K, V> {
-    return MultimapBuilder.hashKeys().arrayListValues().build(this.toGuava()).toKotlin()
-}
-
-/**
- * Returns a new [ListMultimap] filled with all elements of this multimap.
- *
- * @see ImmutableGuavaListMultimap.copyOf
- */
-public fun <K, V> Multimap<K, V>.toListMultimap(): ListMultimap<K, V> {
-    return ImmutableGuavaListMultimap.copyOf(this.toGuava()).toKotlin()
-}
-
-/**
- * The list collection type for a multimap.
- * Used by the [ListMultimap] builder inference methods.
- *
- * @see buildMutableListMultimap
- * @see MultimapBuilder
- */
-public enum class ListMultimapValueType {
-    /**
-     * Uses a backing array list to store values.
-     *
-     * @see MultimapBuilder.MultimapBuilderWithKeys.arrayListValues
-     */
-    ARRAY_LIST,
-    
-    /**
-     * Uses a backing linked list to store values.
-     *
-     * @see MultimapBuilder.MultimapBuilderWithKeys.linkedListValues
-     */
-    LINKED_LIST,
 }
 
 /**
