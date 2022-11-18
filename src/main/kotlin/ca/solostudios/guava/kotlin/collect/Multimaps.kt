@@ -369,6 +369,9 @@ public interface Multimap<K, out V> : Iterable<Entry<K, V>> {
      */
     public fun asMap(): Map<K, Collection<V>>
     
+    /**
+     * Returns an iterator over the elements of this object.
+     */
     override fun iterator(): Iterator<Entry<K, V>> = entries.iterator()
 }
 
@@ -472,6 +475,9 @@ public interface MutableMultimap<K, V> : Multimap<K, V>, MutableIterable<Entry<K
      */
     public override val entries: MutableCollection<Entry<K, V>>
     
+    /**
+     * Returns an iterator over the elements of this sequence that supports removing elements during iteration.
+     */
     override fun iterator(): MutableIterator<Entry<K, V>> = entries.iterator()
 }
 
