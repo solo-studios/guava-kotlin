@@ -106,16 +106,18 @@ tasks {
     
     withType<DokkaTask>().configureEach {
         dependsOn(processDokkaIncludes)
-        
+    
         var outputDirectory by outputDirectory
         val docsVersionsDir = outputDirectory.resolve("versions")
         val docsCurrentVersionDir = docsVersionsDir.resolve(version.toString())
-        val docsOlderVersions = docsVersionsDir.listFiles { file: File -> file != docsCurrentVersionDir }?.toList().orEmpty()
+        val docsOlderVersions = docsVersionsDir.listFiles { file: File ->
+            file != docsCurrentVersionDir
+        }?.toList()?.takeIf { isCI }.orEmpty()
         val renderedDocsDir = buildDir.resolve("docs").resolve(outputDirectory.name)
-        
-        
+    
+    
         outputDirectory = docsCurrentVersionDir
-        
+    
         docsOlderVersions.forEach {
             inputs.dir(it)
         }
@@ -328,6 +330,9 @@ idea {
 /*-----------------------*
  | BEGIN Utility Methods |
  *-----------------------*/
+
+val isCI: Boolean
+    get() = System.getenv("CI") != null
 
 fun IdeaProject.settings(configuration: ProjectSettings.() -> Unit) {
     (this as ExtensionAware).configure(configuration)
