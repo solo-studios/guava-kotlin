@@ -213,9 +213,9 @@ publishing {
             pom {
                 name.set("Guava Kotlin")
                 description.set(
-                        "Guava Kotlin is a set of extensions and other utilities to Google's Guava library, " +
-                        "to provide a more idiomatic way to use it in Kotlin."
-                               )
+                    "Guava Kotlin is a set of extensions and other utilities to Google's Guava library, " +
+                            "to provide a more idiomatic way to use it in Kotlin."
+                )
                 description.set("A set of Kotlin extensions for the Guava library.")
                 url.set("https://github.com/solo-studios/guava-kotlin")
 
@@ -250,14 +250,28 @@ publishing {
 
     repositories {
         maven {
-            name = "sonatypeStaging"
-            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2")
+            name = "Sonatype"
+
+            val repositoryId: String? by project
+            url = when {
+                isSnapshot -> uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                repositoryId != null -> uri("https://s01.oss.sonatype.org/service/local/staging/deployByRepositoryId/$repositoryId/")
+                else -> uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            }
+
             credentials(PasswordCredentials::class)
         }
         maven {
-            name = "sonatypeSnapshot"
-            url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            name = "SoloStudios"
+
+            val releasesUrl = uri("https://maven.solo-studios.ca/releases/")
+            val snapshotUrl = uri("https://maven.solo-studios.ca/snapshots/")
+            url = if (isSnapshot) snapshotUrl else releasesUrl
+
             credentials(PasswordCredentials::class)
+            authentication { // publishing doesn't work without this for some reason
+                create<BasicAuthentication>("basic")
+            }
         }
     }
 }
@@ -270,8 +284,8 @@ signing {
 /**
  * Version class, which does version stuff.
  */
-data class Version(val major: String, val minor: String, val patch: String) {
-    override fun toString(): String = "$major.$minor.$patch"
+data class Version(val major: String, val minor: String, val patch: String, val snapshot: Boolean = false) {
+    override fun toString(): String = if (!snapshot) "$major.$minor.$patch" else "$major.$minor.$patch-SNAPSHOT"
 }
 
 /**
@@ -305,14 +319,14 @@ idea {
                             |limitations under the License.
                         """.trimMargin()
                         keyword = "Copyright"
-                        //language=RegExp
+                        // language=RegExp
                         allowReplaceRegexp = "20[0-9]{2}"
                     }
                     useDefault = copyright.name
 
                     scopes = mapOf(
-                            "Project Files" to copyright.name
-                                  )
+                        "Project Files" to copyright.name
+                    )
                 }
             }
         }
@@ -330,6 +344,9 @@ idea {
 /*-----------------------*
  | BEGIN Utility Methods |
  *-----------------------*/
+
+val Project.isSnapshot: Boolean
+    get() = version.toString().endsWith("-SNAPSHOT")
 
 val isCI: Boolean
     get() = System.getenv("CI") != null
