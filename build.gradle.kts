@@ -48,7 +48,7 @@ plugins {
 }
 
 group = "ca.solo-studios"
-val versionObj = Version("0", "1", "1")
+val versionObj = Version("0", "1", "2")
 version = versionObj.toString()
 
 repositories {

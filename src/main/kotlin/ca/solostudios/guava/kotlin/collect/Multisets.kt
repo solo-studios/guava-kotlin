@@ -344,7 +344,7 @@ public interface Multiset<out E> : Collection<E> {
      *
      * @see count
      */
-    public fun get(element: @UnsafeVariance E): Int = count(element)
+    public operator fun get(element: @UnsafeVariance E): Int = count(element)
 
     // Views
     /**
