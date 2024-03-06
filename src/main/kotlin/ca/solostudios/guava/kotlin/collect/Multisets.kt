@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2022-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ public fun <T> emptyMultiset(): Multiset<T> = ImmutableGuavaMultiset.of<T>().toK
 public fun <T> multisetOf(vararg elements: T): Multiset<T> {
     return if (elements.isNotEmpty())
         ImmutableGuavaMultiset.copyOf(elements)
-                .toKotlin()
+            .toKotlin()
     else
         emptyMultiset()
 }
@@ -65,7 +65,7 @@ public fun <T> mutableMultisetOf(): MutableMultiset<T> = HashMultiset.create<T>(
  */
 public fun <T> mutableMultisetOf(vararg elements: T): MutableMultiset<T> {
     return HashMultiset.create(elements.toList())
-            .toKotlin()
+        .toKotlin()
 }
 
 /**
@@ -106,7 +106,7 @@ public fun <E> GuavaMultiset<E>.toKotlin(): MutableMultiset<E> {
 public fun <E> Multiset<E>.toGuava(): ImmutableGuavaMultiset<E> {
     return when (this) {
         is AbstractGuavaMultisetWrapper -> ImmutableGuavaMultiset.copyOf(this.guavaMultiset)
-        else                            -> ImmutableGuavaMultiset.copyOf(this)
+        else -> ImmutableGuavaMultiset.copyOf(this)
     }
 }
 
@@ -122,7 +122,7 @@ public fun <E> Multiset<E>.toGuava(): ImmutableGuavaMultiset<E> {
 public fun <E> MutableMultiset<E>.toGuava(): GuavaMultiset<E> {
     return when (this) {
         is AbstractMutableGuavaMultisetWrapper -> this.guavaMultiset
-        else                                   -> GuavaHashMultiset.create(this)
+        else -> GuavaHashMultiset.create(this)
     }
 }
 
@@ -182,6 +182,17 @@ public operator fun <E> Multiset<E>.minus(other: Multiset<E>): Multiset<E> {
 }
 
 /**
+ * Returns a [Map]<[E], [Int]> of the elements and their counts.
+ *
+ * @param E the type of the multiset
+ * @return A map representing the elements and their counts.
+ */
+public fun <E> Multiset<E>.asMap(): Map<E, Int> = entrySet.fold(mutableMapOf()) { map, entry ->
+    map[entry.element] = entry.count
+    map
+}
+
+/**
  * Builds a new immutable multiset with the given [builderAction],
  * using the builder inference api.
  *
@@ -198,11 +209,11 @@ public operator fun <E> Multiset<E>.minus(other: Multiset<E>): Multiset<E> {
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <E> buildMultiset(
     @BuilderInference builderAction: ImmutableMultiset.Builder<E>.() -> Unit,
-                                   ): Multiset<E> {
+): Multiset<E> {
     return ImmutableMultiset.builder<E>()
-            .apply(builderAction)
-            .build()
-            .toKotlin()
+        .apply(builderAction)
+        .build()
+        .toKotlin()
 }
 
 /**
@@ -226,13 +237,13 @@ public inline fun <E> buildMultiset(
 public inline fun <E> buildMutableMultiset(
     valueType: SetMultisetType = HASH_MULTISET,
     @BuilderInference builderAction: MutableMultiset<E>.() -> Unit,
-                                          ): MutableMultiset<E> {
+): MutableMultiset<E> {
     val guavaMultiset = when (valueType) {
-        HASH_MULTISET            -> GuavaHashMultiset.create<E>()
-        LINKED_HASH_MULTISET     -> GuavaLinkedHashMultiset.create<E>()
+        HASH_MULTISET -> GuavaHashMultiset.create<E>()
+        LINKED_HASH_MULTISET -> GuavaLinkedHashMultiset.create<E>()
         CONCURRENT_HASH_MULTISET -> GuavaConcurrentHashMultiset.create<E>()
     }
-    
+
     return guavaMultiset.toKotlin().apply(builderAction)
 }
 
@@ -250,14 +261,14 @@ public enum class SetMultisetType {
      * @see GuavaHashMultiset
      */
     HASH_MULTISET,
-    
+
     /**
      * Uses a backing linked hashmap to store values.
      *
      * @see GuavaLinkedHashMultiset
      */
     LINKED_HASH_MULTISET,
-    
+
     /**
      * Uses a backing concurrent hashmap to store values.
      *
@@ -291,14 +302,14 @@ public interface Multiset<out E> : Collection<E> {
      * @see GuavaMultiset.size
      */
     public override val size: Int
-    
+
     /**
      * Returns `true` if the multiset is empty (contains no elements), `false` otherwise.
      *
      * @see GuavaMultiset.isEmpty
      */
     public override fun isEmpty(): Boolean
-    
+
     /**
      * Returns the number of occurrences of an element in this multiset (the *count* of the
      * element). Note that for an [Object.equals]-based multiset, this gives the same result as
@@ -315,7 +326,26 @@ public interface Multiset<out E> : Collection<E> {
      * negative
      */
     public fun count(element: @UnsafeVariance E): Int
-    
+
+    /**
+     * Returns the number of occurrences of an element in this multiset (the *count* of the
+     * element). Note that for an [Object.equals]-based multiset, this gives the same result as
+     * [Collections.frequency] (which would presumably perform more poorly).
+     *
+     *
+     * **Note:** the utility method [Iterables.frequency] generalizes this operation; it
+     * correctly delegates to this method when dealing with a multiset, but it can also accept any
+     * other iterable type.
+     *
+     * @param element the element to count occurrences of
+     *
+     * @return the number of occurrences of the element in this multiset; possibly zero but never
+     * negative
+     *
+     * @see count
+     */
+    public fun get(element: @UnsafeVariance E): Int = count(element)
+
     // Views
     /**
      * Returns a read-only [Set] of all non-duplicate values in this set.
@@ -323,7 +353,7 @@ public interface Multiset<out E> : Collection<E> {
      * @see GuavaMultiset.elementSet
      */
     public val elementSet: Set<E>
-    
+
     /**
      * Returns a read-only [Collection] of all elements in this set, grouped into [Multiset.Entry][GuavaMultiset.Entry] instances,
      * each providing an element of the multiset and the count of that element.
@@ -358,7 +388,7 @@ public interface MutableMultiset<E> : Multiset<E>, MutableCollection<E> {
      * @see GuavaMultiset.add
      */
     public fun add(element: E, occurrences: Int): Int
-    
+
     /**
      * Removes a number of occurrences of the specified element from this multiset. If the multiset
      * contains fewer than this number of occurrences to begin with, all occurrences will be removed.
@@ -375,7 +405,7 @@ public interface MutableMultiset<E> : Multiset<E>, MutableCollection<E> {
      */
     @Throws(IllegalArgumentException::class)
     public fun remove(element: E, occurrences: Int): Int
-    
+
     /**
      * Adds or removes the necessary occurrences of an element such that the element attains the
      * desired count.
@@ -392,7 +422,7 @@ public interface MutableMultiset<E> : Multiset<E>, MutableCollection<E> {
      */
     @Throws(IllegalArgumentException::class)
     public fun setCount(element: E, count: Int): Int
-    
+
     /**
      * Conditionally sets the count of an element to a new value, as described in [setCount], provided that the element has the expected current count. If the
      * current count is not [oldCount], no change is made.
@@ -411,11 +441,11 @@ public interface MutableMultiset<E> : Multiset<E>, MutableCollection<E> {
 }
 
 internal class GuavaMultisetWrapper<out E>(
-    override val guavaMultiset: ImmutableGuavaMultiset<@UnsafeVariance E>
-                                          ) : Multiset<@UnsafeVariance E>,
-                                              AbstractGuavaMultisetWrapper<E>()
+    override val guavaMultiset: ImmutableGuavaMultiset<@UnsafeVariance E>,
+) : Multiset<@UnsafeVariance E>,
+    AbstractGuavaMultisetWrapper<E>()
 
 internal class MutableGuavaMultisetWrapper<E>(
-    override val guavaMultiset: GuavaMultiset<E>
-                                             ) : MutableMultiset<E>,
-                                                 AbstractMutableGuavaMultisetWrapper<E>()
+    override val guavaMultiset: GuavaMultiset<E>,
+) : MutableMultiset<E>,
+    AbstractMutableGuavaMultisetWrapper<E>()
