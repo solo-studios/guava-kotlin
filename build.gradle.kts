@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2022-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,15 +40,15 @@ plugins {
     `java-library`
     `maven-publish`
     alias(libs.plugins.kotlin.jvm)
-    
+
     alias(libs.plugins.dokka)
-    
+
     idea
     alias(libs.plugins.idea.ext)
 }
 
 group = "ca.solo-studios"
-val versionObj = Version("0", "1", "0")
+val versionObj = Version("0", "1", "1")
 version = versionObj.toString()
 
 repositories {
@@ -73,40 +73,40 @@ kotlin {
 dependencies {
     api(libs.bundles.kotlin)
     api(libs.guava)
-    
+
     api(libs.kotlin.reflect)
-    
+
     compileOnly(libs.bundles.kotlinx.coroutines)
-    
+
     testImplementation(libs.bundles.junit)
     testImplementation(kotlin("test"))
-    
+
     dokkaPlugin(libs.dokka.versioning.plugin)
 }
 
 tasks {
     withType<Test>().configureEach {
         useJUnitPlatform()
-        
+
         failFast = false
         maxParallelForks = max(Runtime.getRuntime().availableProcessors() - 1, 1)
     }
-    
+
     withType<Javadoc>().configureEach {
         options {
             encoding = "UTF-8"
         }
     }
-    
+
     withType<Jar>().configureEach {
         metaInf {
             from(rootProject.file("LICENSE"))
         }
     }
-    
+
     withType<DokkaTask>().configureEach {
         dependsOn(processDokkaIncludes)
-    
+
         var outputDirectory by outputDirectory
         val docsVersionsDir = outputDirectory.resolve("versions")
         val docsCurrentVersionDir = docsVersionsDir.resolve(version.toString())
@@ -114,54 +114,54 @@ tasks {
             file != docsCurrentVersionDir
         }?.toList()?.takeIf { isCI }.orEmpty()
         val renderedDocsDir = buildDir.resolve("docs").resolve(outputDirectory.name)
-    
-    
+
+
         outputDirectory = docsCurrentVersionDir
-    
+
         docsOlderVersions.forEach {
             inputs.dir(it)
         }
         outputs.dirs(renderedDocsDir, docsCurrentVersionDir)
-        
-        
+
+
         pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
             footerMessage = "© ${Year.now()} Copyright solo-studios"
         }
-        
+
         pluginConfiguration<VersioningPlugin, VersioningConfiguration> {
             version = project.version.toString()
             olderVersions = docsOlderVersions
         }
-        
+
         doFirst {
             docsCurrentVersionDir.cleanDirectoryContents()
         }
-        
+
         doLast {
             renderedDocsDir.deleteRecursively()
             docsCurrentVersionDir.copyRecursively(renderedDocsDir)
             docsCurrentVersionDir.resolve("older").deleteRecursively()
         }
-        
+
         dokkaSourceSets.configureEach {
             includes.from(processDokkaIncludes.destinationDir.listFiles())
-            
+
             jdkVersion.set(8)
             reportUndocumented.set(true)
-    
+
             // Documentation link
             sourceLink {
                 localDirectory.set(file("src/main/kotlin"))
                 remoteUrl.set(URL("https://github.com/solo-studios/guava-kotlin/tree/master/src/main/kotlin"))
                 remoteLineSuffix.set("#L")
             }
-            
+
             val guavaVersion = libs.guava.get().versionConstraint.requiredVersion.ifEmpty { "snapshot" }
             val guavaDocsUrl = "https://guava.dev/releases/$guavaVersion/api/docs/"
-            
+
             externalDocumentationLink(guavaDocsUrl, "$guavaDocsUrl/element-list")
         }
-        
+
         group = JavaBasePlugin.DOCUMENTATION_GROUP
     }
 }
@@ -205,11 +205,11 @@ publishing {
             artifact(jar)
             artifact(sourcesJar)
             artifact(javadocJar)
-    
+
             version = version.toString()
             groupId = group.toString()
             artifactId = "guava-kotlin"
-    
+
             pom {
                 name.set("Guava Kotlin")
                 description.set(
@@ -218,9 +218,9 @@ publishing {
                                )
                 description.set("A set of Kotlin extensions for the Guava library.")
                 url.set("https://github.com/solo-studios/guava-kotlin")
-        
+
                 inceptionYear.set("2022")
-        
+
                 licenses {
                     license {
                         name.set("Apache License 2.0")
@@ -247,7 +247,7 @@ publishing {
             }
         }
     }
-    
+
     repositories {
         maven {
             name = "sonatypeStaging"
@@ -309,7 +309,7 @@ idea {
                         allowReplaceRegexp = "20[0-9]{2}"
                     }
                     useDefault = copyright.name
-                    
+
                     scopes = mapOf(
                             "Project Files" to copyright.name
                                   )
