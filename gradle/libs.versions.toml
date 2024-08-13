@@ -1,7 +1,8 @@
 [versions]
-kotlin = "1.7.10"
+kotlin = "1.9.20"
 kotlinx-coroutines = "1.6.4"
 junit-jupiter = "5.9.1"
+nyx = "0.2.3"
 
 [plugins]
 # Kotlin JVM
@@ -16,12 +17,16 @@ idea-ext = { id = "org.jetbrains.gradle.plugin.idea-ext", version = "1.1.6" }
 ## Javadoc generation
 dokka = { id = "org.jetbrains.dokka", version.ref = "kotlin" }
 
+# Nyx
+## Gradle conventions plugin
+nyx = { id = "ca.solo-studios.nyx", version.ref = "nyx" }
+
 [libraries]
 
 # Kotlin stdlib
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
-kotlin-stdlib-jdk7 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk7", version.ref = "kotlin" }
-kotlin-stdlib-jdk8 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
+
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
 
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 
@@ -30,7 +35,7 @@ kotlinx-coroutines-jdk8 = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 
 # Guava
 ## A set of core Java libraries from Google that includes new collection types, immutable collections, a graph library,
-##      and utilities for concurrency, I/O, hashing, caching, primitives, strings, and more
+## and utilities for concurrency, I/O, hashing, caching, primitives, strings, and more
 guava = { group = "com.google.guava", name = "guava", version = "31.1-jre" }
 
 # JUnit
@@ -42,12 +47,6 @@ junit-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-para
 dokka-versioning-plugin = { group = "org.jetbrains.dokka", name = "versioning-plugin", version.ref = "kotlin" }
 
 [bundles]
-kotlin = [
-    "kotlin-stdlib",
-    "kotlin-stdlib-jdk7",
-    "kotlin-stdlib-jdk8"
-]
-
 kotlinx-coroutines = [
     "kotlinx-coroutines-core",
     "kotlinx-coroutines-jdk8"

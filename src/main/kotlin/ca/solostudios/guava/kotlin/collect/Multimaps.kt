@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2022-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,22 +29,22 @@ import com.google.common.collect.Multimap as GuavaMultimap
  *
  * Prefer [setMultimapOf] or [listMultimapOf] over this.
  */
-public fun <K, V> emptyMultimap(): Multimap<K, V> = ImmutableGuavaMultimap.of<K, V>().toKotlin()
+public fun <K : Any, V : Any> emptyMultimap(): Multimap<K, V> = ImmutableGuavaMultimap.of<K, V>().toKotlin()
 
 /**
  * Returns a new read-only [Multimap] of given elements.
  *
  * Prefer [setMultimapOf] or [listMultimapOf] over this.
  */
-public fun <K, V> multimapOf(vararg elements: Pair<K, V>): Multimap<K, V> {
+public fun <K : Any, V : Any> multimapOf(vararg elements: Pair<K, V>): Multimap<K, V> {
     return if (elements.isNotEmpty())
         ImmutableGuavaMultimap.builder<K, V>()
-                .also {
-                    for ((key, value) in elements)
-                        it.put(key, value)
-                }
-                .build()
-                .toKotlin()
+            .also {
+                for ((key, value) in elements)
+                    it.put(key, value)
+            }
+            .build()
+            .toKotlin()
     else
         emptyMultimap()
 }
@@ -55,15 +55,15 @@ public fun <K, V> multimapOf(vararg elements: Pair<K, V>): Multimap<K, V> {
  * Prefer [setMultimapOf] or [listMultimapOf] over this.
  */
 @JvmName("multimapOfCollection")
-public fun <K, V> multimapOf(vararg elements: Pair<K, Collection<V>>): Multimap<K, V> {
+public fun <K : Any, V : Any> multimapOf(vararg elements: Pair<K, Collection<V>>): Multimap<K, V> {
     return if (elements.isNotEmpty())
         ImmutableGuavaMultimap.builder<K, V>()
-                .also {
-                    for ((key, value) in elements)
-                        it.putAll(key, value)
-                }
-                .build()
-                .toKotlin()
+            .also {
+                for ((key, value) in elements)
+                    it.putAll(key, value)
+            }
+            .build()
+            .toKotlin()
     else
         emptyMultimap()
 }
@@ -73,7 +73,7 @@ public fun <K, V> multimapOf(vararg elements: Pair<K, Collection<V>>): Multimap<
  *
  * Prefer [setMultimapOf] or [listMultimapOf] over this.
  */
-public fun <K, V> multimapOf(): Multimap<K, V> = emptyMultimap()
+public fun <K : Any, V> multimapOf(): Multimap<K, V> = emptyMultimap()
 
 /**
  * Returns an empty new [Multimap].
@@ -82,9 +82,9 @@ public fun <K, V> multimapOf(): Multimap<K, V> = emptyMultimap()
  */
 public fun <K, V> mutableMultimapOf(): MutableMultimap<K, V> {
     return MultimapBuilder.hashKeys()
-            .arrayListValues()
-            .build<K, V>()
-            .toKotlin()
+        .arrayListValues()
+        .build<K, V>()
+        .toKotlin()
 }
 
 /**
@@ -94,13 +94,13 @@ public fun <K, V> mutableMultimapOf(): MutableMultimap<K, V> {
  */
 public fun <K, V> mutableMultimapOf(vararg elements: Pair<K, V>): MutableMultimap<K, V> {
     return MultimapBuilder.hashKeys()
-            .arrayListValues()
-            .build<K, V>()
-            .also {
-                for ((key, value) in elements)
-                    it.put(key, value)
-            }
-            .toKotlin()
+        .arrayListValues()
+        .build<K, V>()
+        .also {
+            for ((key, value) in elements)
+                it.put(key, value)
+        }
+        .toKotlin()
 }
 
 /**
@@ -111,25 +111,24 @@ public fun <K, V> mutableMultimapOf(vararg elements: Pair<K, V>): MutableMultima
 @JvmName("mutableMultimapOfCollection")
 public fun <K, V> mutableMultimapOf(vararg elements: Pair<K, Collection<V>>): MutableMultimap<K, V> {
     return MultimapBuilder.hashKeys()
-            .arrayListValues()
-            .build<K, V>()
-            .also {
-                for ((key, value) in elements)
-                    it.putAll(key, value)
-            }
-            .toKotlin()
+        .arrayListValues()
+        .build<K, V>()
+        .also {
+            for ((key, value) in elements)
+                it.putAll(key, value)
+        }
+        .toKotlin()
 }
 
 /**
  * Wraps an immutable guava multimap into a [Multimap] instance.
  *
  * @return The wrapped guava multimap.
- *
  * @see GuavaMultimap
  * @see MutableMultimap
  * @see Multimap
  */
-public fun <K, V> ImmutableGuavaMultimap<K, V>.toKotlin(): Multimap<K, V> {
+public fun <K : Any, V : Any> ImmutableGuavaMultimap<K, V>.toKotlin(): Multimap<K, V> {
     return GuavaMultimapWrapper(ImmutableListMultimap.copyOf(this))
 }
 
@@ -137,7 +136,6 @@ public fun <K, V> ImmutableGuavaMultimap<K, V>.toKotlin(): Multimap<K, V> {
  * Wraps a guava multimap into a [MutableMultimap] instance.
  *
  * @return The wrapped guava multimap.
- *
  * @see GuavaMultimap
  * @see MutableMultimap
  * @see Multimap
@@ -150,7 +148,6 @@ public fun <K, V> GuavaMultimap<K, V>.toKotlin(): MutableMultimap<K, V> {
  * Transforms a [Multimap] into its immutable guava equivalent
  *
  * @return A copy of the backing guava multimap.
- *
  * @see ImmutableGuavaMultimap
  * @see GuavaMultimap
  * @see Multimap
@@ -158,9 +155,9 @@ public fun <K, V> GuavaMultimap<K, V>.toKotlin(): MutableMultimap<K, V> {
 public fun <K, V> Multimap<K, V>.toGuava(): ImmutableGuavaMultimap<K, V> {
     return when (this) {
         is AbstractGuavaMultimapWrapper -> ImmutableGuavaMultimap.copyOf(this.guavaMultimap)
-        else                            -> ImmutableGuavaMultimap.builder<K, V>().also {
+        else -> ImmutableGuavaMultimap.builder<K, V>().also {
             for (key in this.keys) {
-                it.putAll(key, this[key])
+                it.putAll(key!!, this[key])
             }
         }.build()
     }
@@ -170,7 +167,6 @@ public fun <K, V> Multimap<K, V>.toGuava(): ImmutableGuavaMultimap<K, V> {
  * Transforms a [MutableMultimap] into its guava equivalent
  *
  * @return A copy of the backing guava multimap.
- *
  * @see GuavaMultimap
  * @see Multimap
  * @see MutableMultimap
@@ -178,21 +174,19 @@ public fun <K, V> Multimap<K, V>.toGuava(): ImmutableGuavaMultimap<K, V> {
 public fun <K, V> MutableMultimap<K, V>.toGuava(): GuavaMultimap<K, V> {
     return when (this) {
         is AbstractMutableGuavaMultimapWrapper -> MultimapBuilder.hashKeys().arrayListValues().build(this.guavaMultimap)
-        
-        else                                   -> {
-            MultimapBuilder.hashKeys()
-                    .arrayListValues()
-                    .build<K, V>()
-                    .also {
-                        for (key in this.keys)
-                            it.putAll(key, this[key])
-                    }
-        }
+        else -> MultimapBuilder.hashKeys()
+            .arrayListValues()
+            .build<K, V>()
+            .also {
+                for (key in this.keys)
+                    it.putAll(key, this[key])
+            }
     }
 }
 
 /**
- * Returns a new [MutableMultimap] filled with all elements of this multimap.
+ * Returns a new [MutableMultimap] filled with all elements of this
+ * multimap.
  *
  * @see MultimapBuilder
  */
@@ -210,71 +204,67 @@ public fun <K, V> Multimap<K, V>.toMultimap(): Multimap<K, V> {
 }
 
 /**
- * Builds a new immutable multimap with the given [builderAction],
- * using the builder inference api.
+ * Builds a new immutable multimap with the given [builderAction], using
+ * the builder inference api.
  *
  * Prefer [buildSetMultimap] or [buildListMultimap] over this.
  *
+ * @param builderAction The builder action to apply to the multimap
  * @param K The key type of the multimap.
  * @param V The value type of the multimap.
- *
- * @param builderAction The builder action to apply to the multimap
- *
  * @return The newly created multimap.
- *
  * @see ImmutableGuavaMultimap.Builder
  */
 @OptIn(ExperimentalTypeInference::class)
-public inline fun <K, V> buildMultimap(
+public inline fun <K : Any, V : Any> buildMultimap(
     @BuilderInference builderAction: ImmutableGuavaMultimap.Builder<K, V>.() -> Unit,
-                                      ): Multimap<K, V> {
+): Multimap<K, V> {
     return ImmutableGuavaMultimap.builder<K, V>()
-            .apply(builderAction)
-            .build()
-            .toKotlin()
+        .apply(builderAction)
+        .build()
+        .toKotlin()
 }
 
 /**
- * Builds a new mutable multimap with the given [builderAction],
- * using the builder inference api.
+ * Builds a new mutable multimap with the given [builderAction], using the
+ * builder inference api.
  *
  * Prefer [buildSetMultimap] or [buildListMultimap] over this.
  *
+ * @param builderAction The builder action to apply to the multimap
  * @param K The key type of the multimap.
  * @param V The value type of the multimap.
- *
- * @param builderAction The builder action to apply to the multimap
- *
  * @return The newly created multimap.
- *
  * @see MultimapBuilder
  */
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <K, V> buildMutableMultimap(
     @BuilderInference builderAction: MutableMultimap<K, V>.() -> Unit,
-                                             ): MutableMultimap<K, V> {
+): MutableMultimap<K, V> {
     return MultimapBuilder.hashKeys()
-            .arrayListValues()
-            .build<K, V>()
-            .toKotlin()
-            .apply(builderAction)
+        .arrayListValues()
+        .build<K, V>()
+        .toKotlin()
+        .apply(builderAction)
 }
 
 /**
- * A collection that holds pairs of objects (keys and values),
- * however each key may be associated with *multiple* values.
+ * A collection that holds pairs of objects (keys and values), however each
+ * key may be associated with *multiple* values.
  *
  * Methods in this interface support only read-only access to the multimap;
  * read-write access is supported through the [MutableMultimap] interface.
  *
- * See the Guava User Guide article on [`Multimap`](https://github.com/google/guava/wiki/NewCollectionTypesExplained#multimap).
+ * See the Guava User Guide article on
+ * [`Multimap`](https://github.com/google/guava/wiki/NewCollectionTypesExplained#multimap).
  *
  * Prefer [SetMultimap] or [ListMultimap] over this.
  *
- * @param K the type of multimap keys. The multimap is invariant in its key type, as it
- *          can accept key as a parameter (of [containsKey] for example) and return it in [keys] set.
- * @param V the type of multimap values. The multimap is covariant in its value type.
- *
+ * @param K the type of multimap keys. The multimap is invariant in its key
+ *         type, as it can accept key as a parameter (of [containsKey] for
+ *         example) and return it in [keys] set.
+ * @param V the type of multimap values. The multimap is covariant in its
+ *         value type.
  * @see GuavaMultimap
  * @see ImmutableGuavaMultimap
  * @see ListMultimap
@@ -284,52 +274,57 @@ public interface Multimap<K, out V> : Iterable<Entry<K, V>> {
     /**
      * Returns the number of key/value pairs in the multimap.
      *
-     *
-     * **Note:** this method does not return the number of *distinct keys* in the multimap,
-     * which is given by `keySet().size()` or `asMap().size()`. See the opening section of
-     * the [Multimap] class documentation for clarification.
+     * **Note:** this method does not return the number of *distinct keys* in
+     * the multimap, which is given by `keySet().size()` or `asMap().size()`.
+     * See the opening section of the [Multimap] class documentation for
+     * clarification.
      *
      * @see GuavaMultimap.size
      */
     public val size: Int
-    
+
     /**
-     * Returns `true` if the multimap is empty (contains no elements), `false` otherwise.
+     * Returns `true` if the multimap is empty (contains no elements), `false`
+     * otherwise.
      *
      * @see GuavaMultimap.isEmpty
      */
     public fun isEmpty(): Boolean
-    
+
     /**
      * Returns `true` if the multimap contains the specified [key].
      *
      * @see GuavaMultimap.containsKey
      */
     public fun containsKey(key: K): Boolean
-    
+
     /**
-     * Returns `true` if the multimap maps one or more keys to the specified [value].
+     * Returns `true` if the multimap maps one or more keys to the specified
+     * [value].
      *
      * @see GuavaMultimap.containsValue
      */
     public fun containsValue(value: @UnsafeVariance V): Boolean
-    
+
     /**
-     * Returns `true` if the multimap contains at least one key-value pair with the key `key` and the value `value`.
+     * Returns `true` if the multimap contains at least one key-value pair with
+     * the key `key` and the value `value`.
      *
      * @see GuavaMultimap.containsEntry
      */
     public fun containsEntry(entry: Pair<K, @UnsafeVariance V>): Boolean
-    
+
     /**
-     * Returns a view of the collection of all the values corresponding to the given [key] in the multimap.
+     * Returns a view of the collection of all the values corresponding to the
+     * given [key] in the multimap.
      *
-     * When the multimap does not [contain][containsKey] the specified key, this will return an empty collection.
+     * When the multimap does not [contain][containsKey] the specified key,
+     * this will return an empty collection.
      *
      * @see GuavaMultimap.get
      */
     public operator fun get(key: K): Collection<V>
-    
+
     // Views
     /**
      * Returns a read-only [Set] of all the keys in this multimap.
@@ -337,38 +332,40 @@ public interface Multimap<K, out V> : Iterable<Entry<K, V>> {
      * @see GuavaMultimap.keySet
      */
     public val keySet: Set<K>
-    
+
     /**
      * Returns a read-only [Set] of all keys in this multimap.
      *
      * @see GuavaMultimap.keys
      */
     public val keys: Multiset<K>
-    
+
     /**
-     * Returns a read-only [Collection] of all values in this map. Note that this collection may contain duplicate values.
+     * Returns a read-only [Collection] of all values in this map. Note that
+     * this collection may contain duplicate values.
      *
      * @see GuavaMultimap.values
      */
     public val values: Collection<V>
-    
+
     /**
      * Returns a read-only [Collection] of all key/value pairs in this map.
      *
      * @see GuavaMultimap.entries
      */
     public val entries: Collection<Entry<K, V>>
-    
+
     /**
-     * Returns a view of this multimap as a [Map] from each distinct key to the nonempty
-     * collection of that key's associated values. Note that `this.asMap().get(k)` is equivalent
-     * to `this.get(k)` only when `k` is a key contained in the multimap; otherwise it
-     * returns `null` as opposed to an empty collection.
+     * Returns a view of this multimap as a [Map] from each distinct key to
+     * the nonempty collection of that key's associated values. Note that
+     * `this.asMap().get(k)` is equivalent to `this.get(k)` only when `k` is a
+     * key contained in the multimap; otherwise it returns `null` as opposed to
+     * an empty collection.
      *
      * @see GuavaMultimap.asMap
      */
     public fun asMap(): Map<K, Collection<V>>
-    
+
     /**
      * Returns an iterator over the elements of this object.
      */
@@ -376,17 +373,18 @@ public interface Multimap<K, out V> : Iterable<Entry<K, V>> {
 }
 
 /**
- * A collection that holds pairs of objects (keys and values),
- * however each key may be associated with *multiple* values.
- * Map keys are unique; the map holds only one value for each key.
+ * A collection that holds pairs of objects (keys and values), however each
+ * key may be associated with *multiple* values. Map keys are unique; the
+ * map holds only one value for each key.
  *
- * See the Guava User Guide article on [`Multimap`](https://github.com/google/guava/wiki/NewCollectionTypesExplained#multimap).
+ * See the Guava User Guide article on
+ * [`Multimap`](https://github.com/google/guava/wiki/NewCollectionTypesExplained#multimap).
  *
  * Prefer [MutableSetMultimap] or [MutableListMultimap] over this.
  *
  * @param K the type of map keys. The map is invariant in its key type.
- * @param V the type of map values. The mutable map is invariant in its value type.
- *
+ * @param V the type of map values. The mutable map is invariant in its
+ *         value type.
  * @see Multimap
  * @see GuavaMultimap
  * @see MutableListMultimap
@@ -396,109 +394,111 @@ public interface MutableMultimap<K, V> : Multimap<K, V>, MutableIterable<Entry<K
     /**
      * Associates the specified [value] with the specified [key] in the map.
      *
-     * @return `true` if the method increased the size of the multimap, or `false` if the
-     * multimap already contained the key-value pair and doesn't allow duplicates
-     *
+     * @return `true` if the method increased the size of the multimap, or
+     *         `false` if the multimap already contained the key-value pair and
+     *         doesn't allow duplicates
      * @see GuavaMultimap.put
      */
     public fun put(key: K, value: V): Boolean
-    
+
     /**
-     * Removes a single key-value pair with the key [key] and the value [value] from this
-     * multimap, if such exists. If multiple key-value pairs in the multimap fit this description,
-     * which one is removed is unspecified.
+     * Removes a single key-value pair with the key [key] and the value [value]
+     * from this multimap, if such exists. If multiple key-value pairs in the
+     * multimap fit this description, which one is removed is unspecified.
      *
      * @return `true` if the multimap changed
-     *
      * @see GuavaMultimap.remove
      */
     public fun remove(key: K, value: V): Boolean
-    
+
     /**
      * Removes all values associated with the key `key`.
      *
-     * Once this method returns, `key` will not be mapped to any values, so it will not
-     * appear in [keySet], [asMap], or any other views.
+     * Once this method returns, `key` will not be mapped to any values, so it
+     * will not appear in [keySet], [asMap], or any other views.
      *
-     * @return the values that were removed (possibly empty). The returned collection *may* be modifiable,
-     * but updating it will have no effect on the multimap.
-     *
+     * @return the values that were removed (possibly empty). The returned
+     *         collection *may* be modifiable, but updating it will have no
+     *         effect on the multimap.
      * @see GuavaMultimap.removeAll
      */
     public fun removeAll(key: K): Collection<V>
-    
+
     // Bulk Modification Operations
     /**
      * Updates this map with key/value pairs from the specified map [from].
      *
      * @returns `true` if the multimap changed.
-     *
      * @see GuavaMultimap.putAll
      */
     public fun putAll(from: Multimap<K, V>): Boolean
-    
+
     /**
      * Updates this map with key/value pair specified by [key] and [values].
      *
      * @returns `true` if the multimap changed.
-     *
      * @see GuavaMultimap.putAll
      */
     public fun putAll(key: K, values: Collection<V>): Boolean
-    
+
     /**
      * Removes all elements from this map.
      *
      * @see GuavaMultimap.clear
      */
     public fun clear()
-    
+
     // Views
     /**
-     * Returns a mutable view of the collection of all the values corresponding to the given [key] in the multimap.
+     * Returns a mutable view of the collection of all the values corresponding
+     * to the given [key] in the multimap.
      *
-     * When the multimap does not [contain][containsKey] the specified key, this will return an empty collection.
+     * When the multimap does not [contain][containsKey] the specified key,
+     * this will return an empty collection.
      *
-     * Changes to the underlying collection will update the underlying multimap, and vice versa.
+     * Changes to the underlying collection will update the underlying
+     * multimap, and vice versa.
      *
      * @see GuavaMultimap.get
      */
     public override operator fun get(key: K): MutableCollection<@UnsafeVariance V>
-    
+
     /**
      * Returns a read-write [Collection] of all key/value pairs in this map.
      *
-     * Changes to the returned collection or the entries it contains will update the underlying
-     * multimap, and vice versa. However, *adding* to the returned collection is not possible.
+     * Changes to the returned collection or the entries it contains will
+     * update the underlying multimap, and vice versa. However, *adding* to the
+     * returned collection is not possible.
      *
      * @see GuavaMultimap.entries
      */
     public override val entries: MutableCollection<Entry<K, V>>
-    
+
     /**
-     * Returns an iterator over the elements of this sequence that supports removing elements during iteration.
+     * Returns an iterator over the elements of this sequence that supports
+     * removing elements during iteration.
      */
     override fun iterator(): MutableIterator<Entry<K, V>> = entries.iterator()
 }
 
-internal class GuavaMultimapWrapper<K, out V>(
-    override val guavaMultimap: ImmutableGuavaMultimap<K, @UnsafeVariance V>
-                                             ) : Multimap<K, V>,
-                                                 AbstractGuavaMultimapWrapper<K, V>() {
+internal class GuavaMultimapWrapper<K : Any, out V>(
+    override val guavaMultimap: ImmutableGuavaMultimap<K, @UnsafeVariance V>,
+) : Multimap<K, V>,
+    AbstractGuavaMultimapWrapper<K, V>() {
     override fun get(key: K): Collection<V> = guavaMultimap.get(key)
-    
+
     @Suppress("UnstableApiUsage")
     override fun asMap(): Map<K, Collection<V>> = Multimaps.asMap(guavaMultimap)
 }
 
 internal class MutableGuavaMultimapWrapper<K, V>(
-    override val guavaMultimap: GuavaMultimap<K, V>
-                                                ) : MutableMultimap<K, V>,
-                                                    AbstractMutableGuavaMultimapWrapper<K, V>() {
+    override val guavaMultimap: GuavaMultimap<K, V>,
+) : MutableMultimap<K, V>,
+    AbstractMutableGuavaMultimapWrapper<K, V>() {
     override fun get(key: K): MutableCollection<V> = guavaMultimap.get(key)
-    
+
     @Suppress("UnstableApiUsage")
     override fun asMap(): Map<K, Collection<V>> = Multimaps.asMap(guavaMultimap)
-    
+
     override fun removeAll(key: K): Collection<V> = guavaMultimap.removeAll(key)
 }
