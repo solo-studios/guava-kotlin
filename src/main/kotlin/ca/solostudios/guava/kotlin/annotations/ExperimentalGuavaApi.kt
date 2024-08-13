@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2022-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,33 +30,35 @@ import kotlin.annotation.AnnotationTarget.TYPEALIAS
 import kotlin.annotation.AnnotationTarget.VALUE_PARAMETER
 
 /**
- * This annotation marks the API that is considered experimental,
- * and that the public API (public classes, methods, or fields) is subject to incompatible changes,
- * or even removal, in a future release.
+ * This annotation marks the API that is considered experimental, and
+ * that the public API (public classes, methods, or fields) is subject
+ * to incompatible changes, or even removal, in a future release.
  *
- * Any public API annotated with this is either experimental, or depends on a guava api annotated with [Beta].
+ * Any public API annotated with this is either experimental, or depends on
+ * a guava api annotated with [Beta].
  *
- * Any usage of a declaration annotated with `@ExperimentalApi` must be either accepted by
- * annotating that usage with the [OptIn] annotation, e.g. `@OptIn(ExperiemntalApi::class)`,
- * or by using the compiler argument `-opt-in=ca.solostudios.guava.kotlin.annotations.ExperimentalApi`
+ * Any usage of a declaration annotated with `@ExperimentalApi` must be
+ * either accepted by annotating that usage with the [OptIn] annotation,
+ * e.g. `@OptIn(ExperiemntalApi::class)`, or by using the compiler argument
+ * `-opt-in=ca.solostudios.guava.kotlin.annotations.ExperimentalApi`
  *
  * @see Beta
  */
 @RequiresOptIn(level = RequiresOptIn.Level.WARNING)
 @Retention(AnnotationRetention.BINARY)
 @Target(
-        CLASS,
-        ANNOTATION_CLASS,
-        PROPERTY,
-        FIELD,
-        LOCAL_VARIABLE,
-        VALUE_PARAMETER,
-        CONSTRUCTOR,
-        FUNCTION,
-        PROPERTY_GETTER,
-        PROPERTY_SETTER,
-        TYPEALIAS
-       )
+    CLASS,
+    ANNOTATION_CLASS,
+    PROPERTY,
+    FIELD,
+    LOCAL_VARIABLE,
+    VALUE_PARAMETER,
+    CONSTRUCTOR,
+    FUNCTION,
+    PROPERTY_GETTER,
+    PROPERTY_SETTER,
+    TYPEALIAS
+)
 @MustBeDocumented
 public annotation class ExperimentalGuavaApi
 

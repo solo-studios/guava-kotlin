@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2022-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import java.io.IOException
 
 /**
  * Throws [this] if it is not `null` and an instance of [X]. Example usage:
- *
  * ```kotlin
  * var failure: Throwable? = null
  * for (foo: Foo in foos) {
@@ -51,8 +50,8 @@ public inline fun <reified X : Throwable> Throwable?.throwIfInstanceOf() {
 }
 
 /**
- * Throws [this] if it is not `null` and a [RuntimeException] or [Error]. Example usage:
- *
+ * Throws [this] if it is not `null` and a [RuntimeException] or [Error].
+ * Example usage:
  * ```kotlin
  * var failure: Throwable? = null
  * for (foo: Foo in foos) {
@@ -76,17 +75,17 @@ public inline fun <reified X : Throwable> Throwable?.throwIfInstanceOf() {
 public fun Throwable?.throwIfUnchecked() {
     if (this == null)
         return
-    
+
     if (this is RuntimeException)
         throw this
-    
+
     if (this is Error)
         throw this
 }
 
 /**
- * Propagates [this] exactly as-is, if and only if it is an instance of [RuntimeException], [Error], or [X]. Example usage:
- *
+ * Propagates [this] exactly as-is, if and only if it is an instance of
+ * [RuntimeException], [Error], or [X]. Example usage:
  * ```kotlin
  * try {
  *     someMethodThatCouldThrowAnything()
@@ -102,10 +101,10 @@ public fun Throwable?.throwIfUnchecked() {
  * @see throwIfUnchecked
  */
 public inline fun <reified X : Throwable> Throwable?.propagateIfPossible() {
-    
+
     if (this == null)
         return
-    
+
     if (this is X)
         throw this
     else
@@ -113,15 +112,14 @@ public inline fun <reified X : Throwable> Throwable?.propagateIfPossible() {
 }
 
 /**
- * Returns the innermost cause of [this]. The first throwable in a chain provides
- * context from when the error or exception was initially detected. Example usage:
- *
+ * Returns the innermost cause of [this]. The first throwable in a chain
+ * provides context from when the error or exception was initially
+ * detected. Example usage:
  * ```kotlin
  * assertEquals("Unable to assign a customer id", e.getRootCause().message)
- *```
+ * ```
  *
  * @throws IllegalArgumentException if there is a loop in the causal chain
- *
  * @see Throwables.getRootCause
  */
 @Throws(IllegalArgumentException::class)
@@ -130,24 +128,21 @@ public inline fun Throwable.getRootCause(): Throwable {
 }
 
 /**
- * Gets a [Throwable] cause chain as a list. The first entry in the list will be `this`
- * followed by its cause hierarchy. Note that this is a snapshot of the cause chain and
- * will not reflect any subsequent changes to the cause chain.
+ * Gets a [Throwable] cause chain as a list. The first entry in the list
+ * will be `this` followed by its cause hierarchy. Note that this is a
+ * snapshot of the cause chain and will not reflect any subsequent changes
+ * to the cause chain.
  *
- *
- * Here's an example of how it can be used to find specific types of exceptions in the cause
- * chain:
- *
+ * Here's an example of how it can be used to find specific types of
+ * exceptions in the cause chain:
  * ```kotlin
  * e.causalChain.filterIsInstance<IOException>()
  * ```
  *
+ * @return an unmodifiable list containing the cause chain starting with
+ *         `this`
  * @receiver the non-null `Throwable` to extract causes from
- *
- * @return an unmodifiable list containing the cause chain starting with `this`
- *
  * @throws IllegalArgumentException if there is a loop in the causal chain
- *
  * @see Throwables.getCausalChain
  */
 @get:Throws(IllegalArgumentException::class)
@@ -157,26 +152,28 @@ public val Throwable.causalChain: List<Throwable>
 /**
  * Returns [this]'s cause, cast to `X`.
  *
- * Prefer this method instead of manually casting an exception's cause. For example,
- * `(e as IOException).getCause()` throws a [ClassCastException] that discards the original
- * exception `e` if the cause is not an [IOException], but
- * `e.getCauseAs<IOException>()` keeps `e` as the [ClassCastException]'s cause.
+ * Prefer this method instead of manually casting an exception's cause. For
+ * example, `(e as IOException).getCause()` throws a [ClassCastException]
+ * that discards the original exception `e` if the cause is not an
+ * [IOException], but `e.getCauseAs<IOException>()` keeps `e` as the
+ * [ClassCastException]'s cause.
  *
- * @throws ClassCastException if the cause cannot be cast to the expected type. The [ClassCastException]'s cause is [this].
- *
+ * @throws ClassCastException if the cause cannot be cast to the expected
+ *         type. The [ClassCastException]'s cause is [this].
  * @see Throwables.getCauseAs
  */
 @Throws(ClassCastException::class)
 public inline fun <reified X : Throwable> Throwable.getCauseAs(
-                                                              ): X? {
+): X? {
     return Throwables.getCauseAs(this, X::class.java)
 }
 
 /**
- * Returns a string containing the result of [toString()][Throwable.toString], followed by
- * the full, recursive stack trace of `this`. Note that you probably should not be
- * parsing the resulting string; if you need programmatic access to the stack frames, you can call
- * [Throwable.getStackTrace].
+ * Returns a string containing the result of
+ * [toString()][Throwable.toString], followed by the full, recursive stack
+ * trace of `this`. Note that you probably should not be parsing the
+ * resulting string; if you need programmatic access to the stack frames,
+ * you can call [Throwable.getStackTrace].
  *
  * @see Throwables.getStackTraceAsString
  */

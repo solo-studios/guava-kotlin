@@ -16,7 +16,6 @@
 
 package ca.solostudios.guava.kotlin.collect
 
-import ca.solostudios.guava.kotlin.annotations.ExperimentalGuavaCollectionsApi
 import ca.solostudios.guava.kotlin.collect.SetMultisetType.CONCURRENT_HASH_MULTISET
 import ca.solostudios.guava.kotlin.collect.SetMultisetType.HASH_MULTISET
 import ca.solostudios.guava.kotlin.collect.SetMultisetType.LINKED_HASH_MULTISET
@@ -72,7 +71,6 @@ public fun <T> mutableMultisetOf(vararg elements: T): MutableMultiset<T> {
  * Wraps an immutable guava multiset into a [Multiset] instance.
  *
  * @return The wrapped guava multiset.
- *
  * @see GuavaMultiset
  * @see MutableMultiset
  * @see Multiset
@@ -85,7 +83,6 @@ public fun <E> ImmutableGuavaMultiset<E>.toKotlin(): Multiset<E> {
  * Wraps a guava multiset into a [MutableMultiset] instance.
  *
  * @return The wrapped guava multiset.
- *
  * @see GuavaMultiset
  * @see MutableMultiset
  * @see Multiset
@@ -98,7 +95,6 @@ public fun <E> GuavaMultiset<E>.toKotlin(): MutableMultiset<E> {
  * Transforms a [Multiset] into its immutable guava equivalent
  *
  * @return A copy of the backing guava multiset.
- *
  * @see ImmutableGuavaMultiset
  * @see GuavaMultiset
  * @see Multiset
@@ -114,7 +110,6 @@ public fun <E> Multiset<E>.toGuava(): ImmutableGuavaMultiset<E> {
  * Transforms a [MutableMultiset] into its guava equivalent
  *
  * @return A copy of the backing guava multiset.
- *
  * @see GuavaMultiset
  * @see MutableMultiset
  * @see Multiset
@@ -127,7 +122,8 @@ public fun <E> MutableMultiset<E>.toGuava(): GuavaMultiset<E> {
 }
 
 /**
- * Returns a new [MutableMultiset] filled with all elements of this collection.
+ * Returns a new [MutableMultiset] filled with all elements of this
+ * collection.
  *
  * @see GuavaHashMultiset.create
  */
@@ -146,37 +142,38 @@ public fun <E> Collection<E>.toMultiset(): Multiset<E> {
 }
 
 /**
- * Returns an unmodifiable view of the sum of two multisets. In the returned multiset, the count
- * of each element is the *sum* of its counts in the two backing multisets. The iteration
- * order of the returned multiset matches that of the element set of [this] followed by
- * the members of the element set of [other] that are not contained in [other],
+ * Returns an unmodifiable view of the sum of two multisets. In the
+ * returned multiset, the count of each element is the *sum* of its counts
+ * in the two backing multisets. The iteration order of the returned
+ * multiset matches that of the element set of [this] followed by the
+ * members of the element set of [other] that are not contained in [other],
  * with repeated occurrences of the same element appearing consecutively.
  *
  * Results are undefined if [this] and [other] are based on different
- * equivalence relations (as [GuavaHashMultiset] and [GuavaTreeMultiset] are).
+ * equivalence relations (as [GuavaHashMultiset] and [GuavaTreeMultiset]
+ * are).
  *
  * @see Multisets.sum
  */
-@ExperimentalGuavaCollectionsApi
-@Suppress("UnstableApiUsage")
 public operator fun <E> Multiset<E>.plus(other: Multiset<E>): Multiset<E> {
     return Multisets.sum(this.toGuava(), other.toGuava()).toKotlin()
 }
 
 /**
- * Returns an unmodifiable view of the difference of two multisets. In the returned multiset, the
- * count of each element is the result of the *zero-truncated subtraction* of its count in
- * the second multiset from its count in the first multiset, with elements that would have a count
- * of 0 not included. The iteration order of the returned multiset matches that of the element set
- * of [this], with repeated occurrences of the same element appearing consecutively.
+ * Returns an unmodifiable view of the difference of two multisets. In
+ * the returned multiset, the count of each element is the result of the
+ * *zero-truncated subtraction* of its count in the second multiset from
+ * its count in the first multiset, with elements that would have a count
+ * of 0 not included. The iteration order of the returned multiset matches
+ * that of the element set of [this], with repeated occurrences of the same
+ * element appearing consecutively.
  *
  * Results are undefined if [this] and [other] are based on different
- * equivalence relations (as [GuavaHashMultiset] and [GuavaTreeMultiset] are).
+ * equivalence relations (as [GuavaHashMultiset] and [GuavaTreeMultiset]
+ * are).
  *
  * @see Multisets.difference
  */
-@ExperimentalGuavaCollectionsApi
-@Suppress("UnstableApiUsage")
 public operator fun <E> Multiset<E>.minus(other: Multiset<E>): Multiset<E> {
     return Multisets.difference(this.toGuava(), other.toGuava()).toKotlin()
 }
@@ -193,17 +190,13 @@ public fun <E> Multiset<E>.asMap(): Map<E, Int> = entrySet.fold(mutableMapOf()) 
 }
 
 /**
- * Builds a new immutable multiset with the given [builderAction],
- * using the builder inference api.
- *
- * @param E the type of the multiset
+ * Builds a new immutable multiset with the given [builderAction], using
+ * the builder inference api.
  *
  * @param builderAction The builder action to apply to the multiset
- *
- * @receiver A builder action applied to immutable multiset builder.
- *
+ * @param E the type of the multiset
  * @return The newly created multiset.
- *
+ * @receiver A builder action applied to immutable multiset builder.
  * @see ImmutableGuavaMultiset.Builder
  */
 @OptIn(ExperimentalTypeInference::class)
@@ -217,21 +210,16 @@ public inline fun <E> buildMultiset(
 }
 
 /**
- * Builds a new multiset with the given [builderAction],
- * using the builder inference api.
- *
- * @param E the type of the multiset
+ * Builds a new multiset with the given [builderAction], using the builder
+ * inference api.
  *
  * @param valueType The collection type used for the backing multiset map.
  * @param builderAction The builder action to apply to the multiset
- *
- * @receiver A builder action applied to the returned multiset.
- *
+ * @param E the type of the multiset
  * @return The newly created multiset.
- *
+ * @receiver A builder action applied to the returned multiset.
  * @see Multiset
  * @see GuavaHashMultiset
- *
  */
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <E> buildMutableMultiset(
@@ -248,8 +236,8 @@ public inline fun <E> buildMutableMultiset(
 }
 
 /**
- * The backing collection type for multiset.
- * Used by the [Multiset] builder inference methods.
+ * The backing collection type for multiset. Used by the [Multiset] builder
+ * inference methods.
  *
  * @see buildMutableMultiset
  * @see Multiset
@@ -278,16 +266,18 @@ public enum class SetMultisetType {
 }
 
 /**
- * A generic unordered collection that supports order-independent equality, like [Set], but may have duplicate
- * elements. A multiset is also sometimes called a *bag*.
+ * A generic unordered collection that supports order-independent equality,
+ * like [Set], but may have duplicate elements. A multiset is also
+ * sometimes called a *bag*.
  *
  * Methods in this interface support only read-only access to the set;
  * read/write access is supported through the [MutableMultiset] interface.
  *
- * See the Guava User Guide article on [`Multiset`](https://github.com/google/guava/wiki/NewCollectionTypesExplained#multiset).
+ * See the Guava User Guide article on
+ * [`Multiset`](https://github.com/google/guava/wiki/NewCollectionTypesExplained#multiset).
  *
- * @param E the type of elements contained in the set. The set is covariant in its element type.
- *
+ * @param E the type of elements contained in the set. The set is covariant
+ *         in its element type.
  * @see GuavaMultiset
  * @see ImmutableGuavaMultiset
  */
@@ -296,52 +286,50 @@ public interface Multiset<out E> : Collection<E> {
     /**
      * Returns the number of elements in the multiset.
      *
-     * **Note:** this method does not return the number of *distinct elements* in the
-     * multiset, which is given by `entrySet().size()`.
+     * **Note:** this method does not return the number of *distinct elements*
+     * in the multiset, which is given by `entrySet().size()`.
      *
      * @see GuavaMultiset.size
      */
     public override val size: Int
 
     /**
-     * Returns `true` if the multiset is empty (contains no elements), `false` otherwise.
+     * Returns `true` if the multiset is empty (contains no elements), `false`
+     * otherwise.
      *
      * @see GuavaMultiset.isEmpty
      */
     public override fun isEmpty(): Boolean
 
     /**
-     * Returns the number of occurrences of an element in this multiset (the *count* of the
-     * element). Note that for an [Object.equals]-based multiset, this gives the same result as
+     * Returns the number of occurrences of an element in this
+     * multiset (the *count* of the element). Note that for an
+     * [Object.equals]-based multiset, this gives the same result as
      * [Collections.frequency] (which would presumably perform more poorly).
      *
-     *
-     * **Note:** the utility method [Iterables.frequency] generalizes this operation; it
-     * correctly delegates to this method when dealing with a multiset, but it can also accept any
-     * other iterable type.
+     * **Note:** the utility method [Iterables.frequency] generalizes this
+     * operation; it correctly delegates to this method when dealing with a
+     * multiset, but it can also accept any other iterable type.
      *
      * @param element the element to count occurrences of
-     *
-     * @return the number of occurrences of the element in this multiset; possibly zero but never
-     * negative
+     * @return the number of occurrences of the element in this multiset;
+     *         possibly zero but never negative
      */
     public fun count(element: @UnsafeVariance E): Int
 
     /**
-     * Returns the number of occurrences of an element in this multiset (the *count* of the
-     * element). Note that for an [Object.equals]-based multiset, this gives the same result as
+     * Returns the number of occurrences of an element in this
+     * multiset (the *count* of the element). Note that for an
+     * [Object.equals]-based multiset, this gives the same result as
      * [Collections.frequency] (which would presumably perform more poorly).
      *
-     *
-     * **Note:** the utility method [Iterables.frequency] generalizes this operation; it
-     * correctly delegates to this method when dealing with a multiset, but it can also accept any
-     * other iterable type.
+     * **Note:** the utility method [Iterables.frequency] generalizes this
+     * operation; it correctly delegates to this method when dealing with a
+     * multiset, but it can also accept any other iterable type.
      *
      * @param element the element to count occurrences of
-     *
-     * @return the number of occurrences of the element in this multiset; possibly zero but never
-     * negative
-     *
+     * @return the number of occurrences of the element in this multiset;
+     *         possibly zero but never negative
      * @see count
      */
     public operator fun get(element: @UnsafeVariance E): Int = count(element)
@@ -355,8 +343,9 @@ public interface Multiset<out E> : Collection<E> {
     public val elementSet: Set<E>
 
     /**
-     * Returns a read-only [Collection] of all elements in this set, grouped into [Multiset.Entry][GuavaMultiset.Entry] instances,
-     * each providing an element of the multiset and the count of that element.
+     * Returns a read-only [Collection] of all elements in this set, grouped
+     * into [Multiset.Entry][GuavaMultiset.Entry] instances, each providing an
+     * element of the multiset and the count of that element.
      *
      * @see GuavaMultiset.entrySet
      */
@@ -364,13 +353,15 @@ public interface Multiset<out E> : Collection<E> {
 }
 
 /**
- * A generic unordered collection that supports order-independent equality, like [Set], but may have duplicate
- * elements. A multiset is also sometimes called a *bag*.
+ * A generic unordered collection that supports order-independent equality,
+ * like [Set], but may have duplicate elements. A multiset is also
+ * sometimes called a *bag*.
  *
- * See the Guava User Guide article on [`Multiset`](https://github.com/google/guava/wiki/NewCollectionTypesExplained#multiset).
+ * See the Guava User Guide article on
+ * [`Multiset`](https://github.com/google/guava/wiki/NewCollectionTypesExplained#multiset).
  *
- * @param E the type of elements contained in the set. The set is covariant in its element type.
- *
+ * @param E the type of elements contained in the set. The set is covariant
+ *         in its element type.
  * @see GuavaMultiset
  */
 public interface MutableMultiset<E> : Multiset<E>, MutableCollection<E> {
@@ -378,63 +369,57 @@ public interface MutableMultiset<E> : Multiset<E>, MutableCollection<E> {
     /**
      * Adds a number of occurrences of an element to this multiset.
      *
-     * @param element the element to add occurrences of; may be null only if explicitly allowed by the
-     * implementation
-     * @param occurrences the number of occurrences of the element to add. May be zero, in which case
-     * no change will be made.
-     *
+     * @param element the element to add occurrences of; may be null only if
+     *         explicitly allowed by the implementation
+     * @param occurrences the number of occurrences of the element to add. May
+     *         be zero, in which case no change will be made.
      * @return the count of the element before the operation; possibly zero
-     *
      * @see GuavaMultiset.add
      */
     public fun add(element: E, occurrences: Int): Int
 
     /**
-     * Removes a number of occurrences of the specified element from this multiset. If the multiset
-     * contains fewer than this number of occurrences to begin with, all occurrences will be removed.
+     * Removes a number of occurrences of the specified element from this
+     * multiset. If the multiset contains fewer than this number of occurrences
+     * to begin with, all occurrences will be removed.
      *
      * @param element the element to conditionally remove occurrences of
-     * @param occurrences the number of occurrences of the element to remove. May be zero, in which
-     * case no change will be made.
-     *
+     * @param occurrences the number of occurrences of the element to remove.
+     *         May be zero, in which case no change will be made.
      * @return the count of the element before the operation; possibly zero
-     *
      * @throws IllegalArgumentException if `occurrences` is negative
-     *
      * @see GuavaMultiset.remove
      */
     @Throws(IllegalArgumentException::class)
     public fun remove(element: E, occurrences: Int): Int
 
     /**
-     * Adds or removes the necessary occurrences of an element such that the element attains the
-     * desired count.
+     * Adds or removes the necessary occurrences of an element such that the
+     * element attains the desired count.
      *
-     * @param element the element to add or remove occurrences of; may be null only if explicitly
-     * allowed by the implementation
+     * @param element the element to add or remove occurrences of; may be null
+     *         only if explicitly allowed by the implementation
      * @param count the desired count of the element in this multiset
-     *
      * @return the count of the element before the operation; possibly zero
-     *
      * @throws IllegalArgumentException if `count` is negative
-     *
      * @see GuavaMultiset.setCount
      */
     @Throws(IllegalArgumentException::class)
     public fun setCount(element: E, count: Int): Int
 
     /**
-     * Conditionally sets the count of an element to a new value, as described in [setCount], provided that the element has the expected current count. If the
-     * current count is not [oldCount], no change is made.
+     * Conditionally sets the count of an element to a new value, as described
+     * in [setCount], provided that the element has the expected current
+     * count. If the current count is not [oldCount], no change is made.
      *
-     * @param element the element to conditionally set the count of; may be null only if explicitly
-     * allowed by the implementation
-     * @param oldCount the expected present count of the element in this multiset
+     * @param element the element to conditionally set the count of; may be
+     *         null only if explicitly allowed by the implementation
+     * @param oldCount the expected present count of the element in this
+     *         multiset
      * @param newCount the desired count of the element in this multiset
-     *
-     * @return `true` if the condition for modification was met.
-     * This implies that the multiset was indeed modified, unless `oldCount == newCount`.
-     *
+     * @return `true` if the condition for modification was met. This implies
+     *         that the multiset was indeed modified, unless `oldCount ==
+     *         newCount`.
      * @see GuavaMultiset.setCount
      */
     public fun setCount(element: E, oldCount: Int, newCount: Int): Boolean

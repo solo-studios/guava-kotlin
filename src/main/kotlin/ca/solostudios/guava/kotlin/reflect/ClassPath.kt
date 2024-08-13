@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2022-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,18 @@ import java.io.IOException
 import java.net.URLClassLoader
 
 /**
- * Returns a [ClassPath] representing all classes and resources loadable from [this] and its ancestor class loaders.
+ * Returns a [ClassPath] representing all classes and resources loadable
+ * from [this] and its ancestor class loaders.
  *
  * **Warning:** `ClassPath` can find classes and resources only from:
- *  - [URLClassLoader] instances' `file:` URLs
- *  - the [system class loader][ClassLoader.getSystemClassLoader]. To search the
- *  system class loader even when it is not a [URLClassLoader] (as in Java 9),
- *  [ClassPath] searches the files from the `java.class.path` system property.
+ * - [URLClassLoader] instances' `file:` URLs
+ * - the [system class loader][ClassLoader.getSystemClassLoader]. To search
+ *   the system class loader even when it is not a [URLClassLoader] (as in
+ *   Java 9), [ClassPath] searches the files from the `java.class.path`
+ *   system property.
  *
- * @throws IOException if the attempt to read class path resources (jar files or directories)
- * failed.
- *
+ * @throws IOException if the attempt to read class path resources (jar
+ *         files or directories) failed.
  * @see ClassPath.from
  */
 @Throws(IOException::class)

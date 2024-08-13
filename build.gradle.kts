@@ -141,6 +141,7 @@ dependencies {
 
     testImplementation(libs.kotlin.test)
     testImplementation(libs.bundles.junit)
+    testImplementation(libs.kotest.runner.junit5)
 }
 
 tasks {

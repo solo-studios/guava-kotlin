@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2022-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package ca.solostudios.guava.kotlin.reflect
 
-import ca.solostudios.guava.kotlin.annotations.ExperimentalGuavaApi
 import com.google.common.reflect.Invokable
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
@@ -29,8 +28,6 @@ import kotlin.reflect.jvm.javaMethod
  *
  * @see Invokable.from
  */
-@ExperimentalGuavaApi
-@Suppress("UnstableApiUsage")
 public fun Method.asInvokable(): Invokable<*, Any?> {
     return Invokable.from(this)
 }
@@ -40,8 +37,6 @@ public fun Method.asInvokable(): Invokable<*, Any?> {
  *
  * @see Invokable.from
  */
-@ExperimentalGuavaApi
-@Suppress("UnstableApiUsage")
 public fun <T> Constructor<T>.asInvokable(): Invokable<T, T> {
     return Invokable.from(this)
 }
@@ -49,20 +44,17 @@ public fun <T> Constructor<T>.asInvokable(): Invokable<T, T> {
 /**
  * Returns [Invokable] of [this].
  *
- * @throws NullPointerException if the [javaMethod] and [javaConstructor] are `null`.
- *
+ * @throws NullPointerException if the [javaMethod] and [javaConstructor]
+ *         are `null`.
  * @see Invokable.from
  * @see KFunction.javaMethod
  * @see KFunction.javaConstructor
  */
-@ExperimentalGuavaApi
-@Suppress("UnstableApiUsage")
 @Throws(NullPointerException::class)
 public fun KFunction<*>.asInvokable(): Invokable<*, Any?> {
-    when {
-        this.javaMethod != null      -> Invokable.from(this.javaMethod!!)
+    return when {
+        this.javaMethod != null -> Invokable.from(this.javaMethod!!)
         this.javaConstructor != null -> Invokable.from(this.javaConstructor!!)
-        else                         -> throw NullPointerException("Both javaMethod and javaConstructor are null.")
+        else -> throw NullPointerException("Both javaMethod and javaConstructor are null.")
     }
-    return Invokable.from(this.javaMethod!!)
 }

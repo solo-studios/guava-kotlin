@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2022-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,8 @@ import com.google.common.base.MoreObjects.ToStringHelper
 /**
  * Creates an instance of [ToStringHelper].
  *
- *
- * This is helpful for implementing [Object.toString]. Specification by example:
- *
+ * This is helpful for implementing [Object.toString]. Specification by
+ * example:
  * ```kotlin
  * // Returns "ClassName{}"
  * this.toStringHelper {
@@ -52,13 +51,11 @@ import com.google.common.base.MoreObjects.ToStringHelper
  * }
  * ```
  *
- * @receiver the object to generate the string for (typically `this`), used only for its
- * class name
- *
  * @param builder The builder applied to [ToStringHelper]
- *
- * @return Returns a string in the format specified by [MoreObjects.toStringHelper].
- *
+ * @return Returns a string in the format specified by
+ *         [MoreObjects.toStringHelper].
+ * @receiver the object to generate the string for (typically `this`), used
+ *         only for its class name
  * @see MoreObjects.toStringHelper
  */
 public inline fun Any.toStringHelper(builder: (ToStringHelper).() -> Unit): String {

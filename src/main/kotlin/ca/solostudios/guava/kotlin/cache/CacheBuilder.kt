@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2022-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,16 @@ import com.google.common.cache.CacheLoader
 import com.google.common.cache.LoadingCache
 
 /**
- * Builds a cache, which either returns an already-loaded value for a given key or atomically
- * computes or retrieves it using the supplied [loader]. If another thread is currently
- * loading the value for this key, simply waits for that thread to finish and returns its loaded
- * value. Note that multiple threads can concurrently load values for distinct keys.
+ * Builds a cache, which either returns an already-loaded value for a given
+ * key or atomically computes or retrieves it using the supplied [loader].
+ * If another thread is currently loading the value for this key, simply
+ * waits for that thread to finish and returns its loaded value. Note
+ * that multiple threads can concurrently load values for distinct keys.
  *
- * This method does not alter the state of this [CacheBuilder] instance, so it can be
- * invoked again to create multiple independent caches.
+ * This method does not alter the state of this [CacheBuilder] instance, so
+ * it can be invoked again to create multiple independent caches.
  *
  * @param loader the cache loader used to obtain new values
- *
  * @return a cache having the requested features
  */
 public inline fun <K, V, K1 : K, V1 : V> CacheBuilder<K, V>.build(noinline loader: (key: K1) -> V1): LoadingCache<K1, V1> {

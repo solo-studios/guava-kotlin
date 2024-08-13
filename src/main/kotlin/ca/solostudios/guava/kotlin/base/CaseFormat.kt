@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2022-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import com.google.common.base.CaseFormat
  *
  * @param from The case format this string is currently in.
  * @param to The case format for this string to be formatted to.
- *
  * @return The new string formatted in the case format of [to].
  */
 public fun String.convert(from: CaseFormat, to: CaseFormat): String {
