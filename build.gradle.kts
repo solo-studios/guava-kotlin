@@ -16,7 +16,14 @@
 
 @file:Suppress("DSL_SCOPE_VIOLATION", "UnstableApiUsage")
 
+import ca.solostudios.dokkascript.plugin.DokkaScriptsConfiguration
+import ca.solostudios.dokkascript.plugin.DokkaScriptsPlugin
+import ca.solostudios.dokkastyles.plugin.DokkaStyleTweaksConfiguration
+import ca.solostudios.dokkastyles.plugin.DokkaStyleTweaksPlugin
 import ca.solostudios.nyx.util.soloStudios
+import com.sass_lang.embedded_protocol.OutputStyle
+import io.freefair.gradle.plugins.sass.SassCompile
+import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.plugins.ide.idea.model.IdeaProject
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
@@ -41,10 +48,12 @@ plugins {
 
     alias(libs.plugins.dokka)
 
-    idea
-    alias(libs.plugins.idea.ext)
+    alias(libs.plugins.sass.base)
 
     alias(libs.plugins.nyx)
+
+    idea
+    alias(libs.plugins.idea.ext)
 }
 
 nyx {
@@ -139,9 +148,22 @@ dependencies {
 
     compileOnly(libs.bundles.kotlinx.coroutines)
 
+    dokkaHtmlPlugin(libs.dokka.plugin.script)
+    dokkaHtmlPlugin(libs.dokka.plugin.style.tweaks)
+
     testImplementation(libs.kotlin.test)
     testImplementation(libs.bundles.junit)
 }
+
+sass {
+    omitSourceMapUrl = true
+    outputStyle = OutputStyle.COMPRESSED
+    sourceMapContents = false
+    sourceMapEmbed = false
+    sourceMapEnabled = false
+}
+
+val dokkaDirs = DokkaDirectories(project)
 
 tasks {
     withType<Test>().configureEach {
@@ -152,30 +174,73 @@ tasks {
     }
 
     val processDokkaIncludes by registering(ProcessResources::class) {
-        from(projectDir.resolve("dokka/includes")) {
-            filesMatching("Module.md") {
-                expand(
-                    "project" to mapOf(
-                        "group" to nyx.info.group,
-                        "module" to nyx.info.module.get(),
-                        "version" to nyx.info.version,
-                    )
+        from(dokkaDirs.includes) {
+            exclude { it.name.startsWith("_") }
+
+            // Yes, these need to be done separately and the replace tokens needs to be first
+            filter<ReplaceTokens>(
+                "tokens" to mapOf("dependency" to dokkaDirs.readInclude("dependency")),
+                "beginToken" to "{{",
+                "endToken" to "}}"
+            )
+
+            expand(
+                "project" to mapOf(
+                    "group" to nyx.info.group,
+                    "module" to nyx.info.module.get(),
+                    "version" to nyx.info.version,
                 )
-            }
+            )
         }
-        destinationDir = layout.buildDirectory.dir("dokka-include").get().asFile
+
+        into(dokkaDirs.includesOutput)
         group = JavaBasePlugin.DOCUMENTATION_GROUP
     }
 
+    val compileDokkaSass by register<SassCompile>("compileDokkaSass") {
+        group = BasePlugin.BUILD_GROUP
+        source = files(dokkaDirs.styles).asFileTree
+        destinationDir = dokkaDirs.stylesOutput
+    }
+
     withType<DokkaTask>().configureEach {
-        dependsOn(processDokkaIncludes)
+        dependsOn(compileDokkaSass, processDokkaIncludes)
+        inputs.files(dokkaDirs.includesOutput, dokkaDirs.stylesOutput, dokkaDirs.templates, dokkaDirs.scripts)
 
         pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
             footerMessage = "© ${Year.now()} Copyright solo-studios"
+
+            val compiledStyles = dokkaDirs.styles.walk().filter {
+                it.isFile && it.extension == "scss" && !it.name.startsWith("_")
+            }.map {
+                dokkaDirs.stylesOutput.file("${it.nameWithoutExtension}.css").asFile
+            }.toList()
+
+            file("a").resolve("aaa")
+
+            customStyleSheets = compiledStyles
+            templatesDir = dokkaDirs.templates
+        }
+
+        pluginConfiguration<DokkaScriptsPlugin, DokkaScriptsConfiguration> {
+            scripts = dokkaDirs.scripts.walk().filter { it.isFile }.toList()
+        }
+
+        pluginConfiguration<DokkaStyleTweaksPlugin, DokkaStyleTweaksConfiguration> {
+            minimalScrollbar = true
+            darkPurpleHighlight = true
+            darkColorSchemeFix = true
+            improvedBlockquoteBorder = true
+            lighterBlockquoteText = true
+            sectionTabFontWeight = "500"
+            sectionTabTransition = true
+            improvedSectionTabBorder = true
+            disableCodeWrapping = true
+            sidebarWidth = "340px"
         }
 
         dokkaSourceSets.configureEach {
-            includes.from(processDokkaIncludes.map { it.destinationDir.listFiles() })
+            includes.from(dokkaDirs.includesOutput.asFileTree)
 
             jdkVersion.set(8)
             reportUndocumented.set(true)
@@ -202,6 +267,22 @@ tasks {
  */
 data class Version(val major: String, val minor: String, val patch: String, val snapshot: Boolean = false) {
     override fun toString(): String = if (!snapshot) "$major.$minor.$patch" else "$major.$minor.$patch-SNAPSHOT"
+}
+
+data class DokkaDirectories(val project: Project) {
+    private val base = project.projectDir.resolve("dokka")
+    private val baseOutput = project.layout.buildDirectory.dir("dokka").get()
+
+    val includes = base.resolve("includes")
+    val includesOutput = baseOutput.dir("includes")
+
+    val styles = base.resolve("styles")
+    val stylesOutput = baseOutput.dir("styles")
+
+    val templates = base.resolve("templates")
+    val scripts = base.resolve("scripts")
+
+    fun readInclude(name: String) = includes.resolve("_$name.md").readText()
 }
 
 /*-----------------------*

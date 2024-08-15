@@ -13,24 +13,4 @@ Please see the subpackages for further documentation on how it wraps Guava.
 
 ## Setup with Gradle
 
-### Gradle Kotlin DSL
-
-```kotlin
-implementation("${project.group}:${project.module}:${project.version}")
-```
-
-### Gradle Groovy DSL
-
-```groovy
-implementation '${project.group}:${project.module}:${project.version}'
-```
-
-### Maven `pom.xml`
-
-```xml
-<dependency>
-  <groupId>${project.group}</groupId>
-  <artifactId>${project.module}</artifactId>
-  <version>${project.version}</version>
-</dependency>
-```
+{{dependency}}

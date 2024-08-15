@@ -1,0 +1,121 @@
+/*!
+ * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* Tab style starts here */
+.tabbed-labels {
+    display: flex;
+    overflow: auto;
+    scrollbar-width: none;
+    width: 100%;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    & > label {
+        border-bottom: 0.1rem solid transparent;
+        border-top-left-radius: 0.1rem;
+        border-top-right-radius: 0.1rem;
+        cursor: pointer;
+        font-size: 0.84em;
+        font-weight: 700;
+        padding: 0.9375em 1.25em 0.78125em;
+        scroll-snap-align: start;
+        transition: background-color 250ms, color 250ms;
+        white-space: nowrap;
+        width: auto;
+    }
+
+
+    & > label:hover {
+        color: var(--active-section-color);
+    }
+}
+
+.tabbed-alternate {
+    border-radius: 0.1rem;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    margin: 1em 0;
+    position: relative;
+
+    & > input {
+        display: none;
+    }
+
+    .tabbed-content {
+        width: 100%;
+    }
+
+    $input-selectors: ();
+    @for $i from 1 through 8 {
+        $input-selectors: append(
+                        $input-selectors,
+                        unquote("input:nth-child(#{$i}):checked ~ .tabbed-content > :nth-child(#{$i})"),
+                        comma,
+        );
+    }
+
+    #{$input-selectors} {
+        display: block;
+    }
+
+    .tabbed-block {
+        display: none;
+    }
+}
+
+@media screen {
+    $input-selectors: ();
+    @for $i from 1 through 8 {
+        $input-selectors: append(
+                        $input-selectors,
+                        unquote(".tabbed-alternate input:nth-child(#{$i}):checked ~ .tabbed-labels > :nth-child(#{$i})"),
+                        comma,
+        );
+    }
+
+    #{$input-selectors} {
+        color: var(--active-section-color);
+        position: relative;
+
+        &::before {
+            //background: var(--active-section-color);
+            background: var(--active-tab-border-color);
+            border-radius: 8px;
+            content: '';
+            height: 4px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+    }
+}
+
+@media print {
+    .tabbed-labels {
+        display: contents;
+    }
+
+    @for $i from 1 through 8 {
+        .tabbed-alternate .tabbed-block:nth-child(#{$i}),
+        .tabbed-labels > label:nth-child(#{$i}) {
+            order: $i;
+        }
+    }
+}

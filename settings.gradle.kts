@@ -28,8 +28,12 @@ buildscript {
     repositories {
         mavenCentral()
     }
+
     dependencies {
         classpath("org.jetbrains.dokka:dokka-core:1.9.20")
         classpath("org.jetbrains.dokka:dokka-base:1.9.20")
+
+        classpath("ca.solo-studios:dokka-script-plugin:0.1.1")
+        classpath("ca.solo-studios:dokka-style-tweaks-plugin:1.1.0")
     }
 }

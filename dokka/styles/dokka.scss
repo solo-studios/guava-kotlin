@@ -1,0 +1,143 @@
+/*!
+ * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@import 'mixins';
+
+/* Checklists/checkboxes */
+
+/* Disable checkboxes */
+input[type='checkbox'][readonly] {
+    pointer-events: none;
+}
+
+//input[type="checkbox"][checked]:not([disabled]) {
+//    outline: 5px auto #349be8;
+//}
+
+.checklist-item {
+    list-style-type: none;
+}
+
+.checklist-item-checkbox {
+    margin: 0 .3em 0 -1.3em;
+}
+
+$code-toolbar-transition: opacity 100ms linear;
+
+/* Copy icon shit */
+.sample-container {
+    &:hover, &:focus {
+        span.copy-icon {
+            opacity: 100%;
+        }
+    }
+
+    span.copy-icon {
+        display: unset;
+        opacity: 0;
+        transition: $code-toolbar-transition;
+    }
+}
+
+/* Fix for prism TOML language */
+.token.table {
+    display: revert;
+}
+
+/* PrismJS 1.29.0
+https://prismjs.com/download.html#themes=prism&languages=markup+css+clike+diff&plugins=autolinker+show-language+autoloader+keep-markup+normalize-whitespace+toolbar+match-braces+diff-highlight */
+
+div.code-toolbar {
+    position: relative;
+
+    > .toolbar {
+        opacity: 0;
+        margin-right: 28px;
+        position: absolute;
+        right: .2em;
+        top: .3em;
+        transition: $code-toolbar-transition;
+        z-index: 10;
+
+        > .toolbar-item {
+            display: inline-block;
+
+            > a, > button, > span {
+                background: #f5f2f0;
+                background: rgba(224, 224, 224, .2);
+                border-radius: .5em;
+                box-shadow: 0 2px 0 0 rgba(0, 0, 0, .2);
+                color: var(--default-font-color);
+                font-size: .8em;
+                padding: 0 .5em;
+
+                &:focus, &:hover {
+                    color: inherit;
+                    @include vendor-prefix(text-decoration, none, webkit);
+                }
+            }
+
+            > a {
+                cursor: pointer;
+            }
+
+            > button {
+                @include vendor-prefix(user-select, none);
+                background: 0 0;
+                border: 0;
+                color: inherit;
+                font: inherit;
+                line-height: normal;
+                overflow: visible;
+                padding: 0;
+            }
+        }
+    }
+
+    &:hover > .toolbar {
+        opacity: 1;
+    }
+
+    &:focus-within > .toolbar {
+        opacity: 1;
+    }
+}
+
+[class*="hover"].token {
+    background-color: unset !important;
+}
+
+.token.punctuation {
+    &.brace-hover, &.brace-selected {
+        outline: solid 1px color-mix(in hsl, var(--default-font-color) 60%, transparent);
+    }
+}
+
+pre.diff-highlight > code, pre > code.diff-highlight {
+    .token {
+        .deleted:not(.prefix) {
+            background-color: rgba(255, 0, 0, .1);
+            color: inherit;
+            display: block;
+        }
+
+        .inserted:not(.prefix) {
+            background-color: rgba(0, 255, 128, .1);
+            color: inherit;
+            display: block;
+        }
+    }
+}

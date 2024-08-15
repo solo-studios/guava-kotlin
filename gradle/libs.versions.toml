@@ -4,6 +4,9 @@ kotlinx-coroutines = "1.8.1"
 junit-jupiter = "5.10.3"
 nyx = "0.2.3"
 guava = "33.2.1-jre"
+freefair-sass = "8.4"
+dokka-plugin-script = "0.1.1"
+dokka-plugin-style-tweaks = "1.1.0"
 
 [plugins]
 # Kotlin JVM
@@ -21,6 +24,9 @@ dokka = { id = "org.jetbrains.dokka", version.ref = "kotlin" }
 # Nyx
 ## Gradle conventions plugin
 nyx = { id = "ca.solo-studios.nyx", version.ref = "nyx" }
+
+# Freefair Sass
+sass-base = { id = "io.freefair.sass-base", version.ref = "freefair-sass" }
 
 [libraries]
 
@@ -44,6 +50,9 @@ guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit-jupiter" }
 junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit-jupiter" }
 junit-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit-jupiter" }
+
+dokka-plugin-script = { group = "ca.solo-studios", name = "dokka-script-plugin", version.ref = "dokka-plugin-script" }
+dokka-plugin-style-tweaks = { group = "ca.solo-studios", name = "dokka-style-tweaks-plugin", version.ref = "dokka-plugin-style-tweaks" }
 
 [bundles]
 kotlinx-coroutines = [
