@@ -33,21 +33,21 @@ import com.google.common.base.MoreObjects.ToStringHelper
  *
  * // Returns "ClassName{x=1}"
  * this.toStringHelper {
- *     add("x", 1)
+ *     this["x"] = 1
  * }
  *
  * // Returns "ClassName{x=1, y=foo}"
  * this.toStringHelper {
- *     add("x", 1)
- *     add("y", "foo")
+ *     this["x"] = 1
+ *     this["y"] = "foo"
  * }
  *
  * // Returns "ClassName{x=1}"
  * this.toStringHelper {
  *     omitNullValues()
  *
- *     add("x", 1)
- *     add("y", null)
+ *     this["x"] = 1
+ *     this["y"] = null
  * }
  * ```
  *

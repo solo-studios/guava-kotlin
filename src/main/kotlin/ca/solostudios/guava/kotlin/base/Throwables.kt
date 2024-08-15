@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:Suppress("NOTHING_TO_INLINE")
-
 package ca.solostudios.guava.kotlin.base
 
 import com.google.common.base.Throwables
@@ -37,21 +35,20 @@ import java.io.IOException
  *     }
  * }
  *
- * failure.throwIfInstanceOf<BarException>()
- * failure.throwIfUnchecked()
- * throw AssertionError(failure)
+ * if (failure != null) {
+ *     failure.throwIfInstanceOf<BarException>()
+ *     throw AssertionError(failure)
+ * }
  * ```
  *
  * @see Throwables.throwIfInstanceOf
  */
-public inline fun <reified X : Throwable> Throwable?.throwIfInstanceOf() {
-    if (this != null && this is X)
-        throw this
+public inline fun <reified X : Throwable> Throwable.throwIfInstanceOf() {
+    Throwables.throwIfInstanceOf(this, X::class.java)
 }
 
 /**
- * Throws [this] if it is not `null` and a [RuntimeException] or [Error].
- * Example usage:
+ * Throws [this] if it is a [RuntimeException] or [Error]. Example usage:
  * ```kotlin
  * var failure: Throwable? = null
  * for (foo: Foo in foos) {
@@ -64,68 +61,32 @@ public inline fun <reified X : Throwable> Throwable?.throwIfInstanceOf() {
  *     }
  * }
  *
- * failure.throwIfInstanceOf<BarException>()
- * failure.throwIfUnchecked
- * throw AssertionError(failure)
+ * if (failure != null) {
+ *     failure.throwIfUnchecked()
+ *     throw AssertionError(failure)
+ * }
  * ```
  *
  * @see Throwables.throwIfUnchecked
  */
 @Throws(RuntimeException::class, Error::class)
-public fun Throwable?.throwIfUnchecked() {
-    if (this == null)
-        return
-
-    if (this is RuntimeException)
-        throw this
-
-    if (this is Error)
-        throw this
+public fun Throwable.throwIfUnchecked() {
+    return Throwables.throwIfUnchecked(this)
 }
 
 /**
- * Propagates [this] exactly as-is, if and only if it is an instance of
- * [RuntimeException], [Error], or [X]. Example usage:
- * ```kotlin
- * try {
- *     someMethodThatCouldThrowAnything()
- * } catch (e: IKnowWhatToDoWithThisException) {
- *     handle(e)
- * } catch (t: Throwable) {
- *     t.propagateIfPossible<OtherException>()
- *     throw RuntimeException("unexpected", t)
- * }
- * ```
- *
- * @see Throwables.propagateIfPossible
- * @see throwIfUnchecked
- */
-public inline fun <reified X : Throwable> Throwable?.propagateIfPossible() {
-
-    if (this == null)
-        return
-
-    if (this is X)
-        throw this
-    else
-        this.throwIfUnchecked()
-}
-
-/**
- * Returns the innermost cause of [this]. The first throwable in a chain
+ * Returns the innermost cause of `this`. The first throwable in a chain
  * provides context from when the error or exception was initially
  * detected. Example usage:
  * ```kotlin
- * assertEquals("Unable to assign a customer id", e.getRootCause().message)
+ * assertEquals("Unable to assign a customer id", e.rootCause.message)
  * ```
  *
  * @throws IllegalArgumentException if there is a loop in the causal chain
  * @see Throwables.getRootCause
  */
-@Throws(IllegalArgumentException::class)
-public inline fun Throwable.getRootCause(): Throwable {
-    return Throwables.getRootCause(this)
-}
+public val Throwable.rootCause: Throwable
+    get() = Throwables.getRootCause(this)
 
 /**
  * Gets a [Throwable] cause chain as a list. The first entry in the list
@@ -153,18 +114,17 @@ public val Throwable.causalChain: List<Throwable>
  * Returns [this]'s cause, cast to `X`.
  *
  * Prefer this method instead of manually casting an exception's cause. For
- * example, `(e as IOException).getCause()` throws a [ClassCastException]
+ * example, `e.getCause() as IOException` throws a [ClassCastException]
  * that discards the original exception `e` if the cause is not an
- * [IOException], but `e.getCauseAs<IOException>()` keeps `e` as the
+ * [IOException], but `e.causeAs<IOException>()` keeps `e` as the
  * [ClassCastException]'s cause.
  *
  * @throws ClassCastException if the cause cannot be cast to the expected
- *         type. The [ClassCastException]'s cause is [this].
+ *         type. The [ClassCastException]'s cause is `this`.
  * @see Throwables.getCauseAs
  */
 @Throws(ClassCastException::class)
-public inline fun <reified X : Throwable> Throwable.getCauseAs(
-): X? {
+public inline fun <reified X : Throwable> Throwable.causeAs(): X? {
     return Throwables.getCauseAs(this, X::class.java)
 }
 

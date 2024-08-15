@@ -22,9 +22,9 @@ import java.net.URLClassLoader
 
 /**
  * Returns a [ClassPath] representing all classes and resources loadable
- * from [this] and its ancestor class loaders.
+ * from `this` and its ancestor class loaders.
  *
- * **Warning:** `ClassPath` can find classes and resources only from:
+ * **Warning:** [ClassPath] can find classes and resources only from:
  * - [URLClassLoader] instances' `file:` URLs
  * - the [system class loader][ClassLoader.getSystemClassLoader]. To search
  *   the system class loader even when it is not a [URLClassLoader] (as in
@@ -39,3 +39,22 @@ import java.net.URLClassLoader
 public fun ClassLoader.asClassPath(): ClassPath {
     return ClassPath.from(this)
 }
+
+/**
+ * Returns a [ClassPath] representing all classes and resources loadable
+ * from `this` and its ancestor class loaders.
+ *
+ * **Warning:** [ClassPath] can find classes and resources only from:
+ * - [URLClassLoader] instances' `file:` URLs
+ * - the [system class loader][ClassLoader.getSystemClassLoader]. To search
+ *   the system class loader even when it is not a [URLClassLoader] (as in
+ *   Java 9), [ClassPath] searches the files from the `java.class.path`
+ *   system property.
+ *
+ * @throws IOException if the attempt to read class path resources (jar
+ *         files or directories) failed.
+ * @see ClassPath.from
+ */
+@get:Throws(IOException::class)
+public val ClassLoader.classPath: ClassPath
+    get() = ClassPath.from(this)
