@@ -20,6 +20,7 @@ import ca.solostudios.dokkascript.plugin.DokkaScriptsConfiguration
 import ca.solostudios.dokkascript.plugin.DokkaScriptsPlugin
 import ca.solostudios.dokkastyles.plugin.DokkaStyleTweaksConfiguration
 import ca.solostudios.dokkastyles.plugin.DokkaStyleTweaksPlugin
+import ca.solostudios.nyx.util.reposiliteMaven
 import ca.solostudios.nyx.util.soloStudios
 import com.sass_lang.embedded_protocol.OutputStyle
 import io.freefair.gradle.plugins.sass.SassCompile
@@ -35,7 +36,7 @@ import org.jetbrains.gradle.ext.GroovyCompilerConfiguration
 import org.jetbrains.gradle.ext.IdeaCompilerConfiguration
 import org.jetbrains.gradle.ext.ProjectSettings
 import org.jetbrains.gradle.ext.RunConfiguration
-import java.net.URL
+import java.io.Serializable
 import java.time.Year
 import kotlin.math.max
 
@@ -44,23 +45,25 @@ plugins {
     signing
     `java-library`
     `maven-publish`
+
     alias(libs.plugins.kotlin.jvm)
-
     alias(libs.plugins.dokka)
-
-    alias(libs.plugins.sass.base)
-
-    alias(libs.plugins.nyx)
 
     idea
     alias(libs.plugins.idea.ext)
+
+    alias(libs.plugins.nyx)
+
+    alias(libs.plugins.axion.release)
+    alias(libs.plugins.sass.base)
 }
 
 nyx {
     info {
-        name = "guava-kotlin"
+        name = "Guava Kotlin"
+        module = "guava-kotlin"
         group = "ca.solo-studios"
-        version = Version("0", "1", "2").toString()
+        version = scmVersion.version
         description = """
             Guava Kotlin is a kotlin wrapper for guava to make it more idiomatic in kotlin.
         """.trimIndent()
@@ -115,21 +118,15 @@ nyx {
                 }
                 credentials(PasswordCredentials::class)
             }
-            maven {
+            reposiliteMaven {
                 name = "SoloStudiosReleases"
                 url = uri("https://maven.solo-studios.ca/releases/")
                 credentials(PasswordCredentials::class)
-                authentication { // publishing doesn't work without this for some reason
-                    create<BasicAuthentication>("basic")
-                }
             }
-            maven {
+            reposiliteMaven {
                 name = "SoloStudiosSnapshots"
                 url = uri("https://maven.solo-studios.ca/snapshots/")
                 credentials(PasswordCredentials::class)
-                authentication { // publishing doesn't work without this for some reason
-                    create<BasicAuthentication>("basic")
-                }
             }
         }
     }
@@ -174,6 +171,12 @@ tasks {
     }
 
     val processDokkaIncludes by registering(ProcessResources::class) {
+        group = JavaBasePlugin.DOCUMENTATION_GROUP
+        description = "Processes the included dokka files"
+
+        val projectInfo = ProjectInfo(nyx.info.group, nyx.info.module.get(), nyx.info.version)
+        inputs.property("projectInfo", projectInfo)
+
         from(dokkaDirs.includes) {
             exclude { it.name.startsWith("_") }
 
@@ -184,17 +187,10 @@ tasks {
                 "endToken" to "}}"
             )
 
-            expand(
-                "project" to mapOf(
-                    "group" to nyx.info.group,
-                    "module" to nyx.info.module.get(),
-                    "version" to nyx.info.version,
-                )
-            )
+            expand("project" to projectInfo)
         }
 
         into(dokkaDirs.includesOutput)
-        group = JavaBasePlugin.DOCUMENTATION_GROUP
     }
 
     val compileDokkaSass by register<SassCompile>("compileDokkaSass") {
@@ -204,6 +200,8 @@ tasks {
     }
 
     withType<DokkaTask>().configureEach {
+        group = JavaBasePlugin.DOCUMENTATION_GROUP
+
         dependsOn(compileDokkaSass, processDokkaIncludes)
         inputs.files(dokkaDirs.includesOutput, dokkaDirs.stylesOutput, dokkaDirs.templates, dokkaDirs.scripts)
 
@@ -215,8 +213,6 @@ tasks {
             }.map {
                 dokkaDirs.stylesOutput.file("${it.nameWithoutExtension}.css").asFile
             }.toList()
-
-            file("a").resolve("aaa")
 
             customStyleSheets = compiledStyles
             templatesDir = dokkaDirs.templates
@@ -247,9 +243,9 @@ tasks {
 
             // Documentation link
             sourceLink {
-                localDirectory.set(file("src/main/kotlin"))
-                remoteUrl.set(URL("https://github.com/solo-studios/guava-kotlin/tree/master/src/main/kotlin"))
-                remoteLineSuffix.set("#L")
+                localDirectory = projectDir.resolve("src")
+                remoteUrl = nyx.info.repository.projectUrl.map { uri("$it/tree/master/src").toURL() }
+                remoteLineSuffix = "#L"
             }
 
             val guavaVersion = libs.guava.get().versionConstraint.requiredVersion.ifEmpty { "snapshot" }
@@ -257,17 +253,10 @@ tasks {
 
             externalDocumentationLink(guavaDocsUrl, "$guavaDocsUrl/element-list")
         }
-
-        group = JavaBasePlugin.DOCUMENTATION_GROUP
     }
 }
 
-/**
- * Version class, which does version stuff.
- */
-data class Version(val major: String, val minor: String, val patch: String, val snapshot: Boolean = false) {
-    override fun toString(): String = if (!snapshot) "$major.$minor.$patch" else "$major.$minor.$patch-SNAPSHOT"
-}
+data class ProjectInfo(val group: String, val module: String, val version: String) : Serializable
 
 data class DokkaDirectories(val project: Project) {
     private val base = project.projectDir.resolve("dokka")
