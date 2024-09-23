@@ -15,7 +15,8 @@ This is sometimes called an "invertible map," since the restriction on values en
 an [inverse view](https://guava.dev/releases/31.1-jre/api/docs/com/google/common/collect/BiMap.html#inverse())
 -- which is another instance of BiMap.
 
-- No wrappers for [`BiMap`][com.google.common.collect.BiMap] currently exist.
+- [`BiMap`][ca.solostudios.guava.kotlin.collect.BiMap]: A read-only bimap.
+- [`MutableBiMap`][ca.solostudios.guava.kotlin.collect.MutableBiMap]: A bimap that supports mutability.
 
 ### [`Multiset`][ca.solostudios.guava.kotlin.collect.Multiset]
 
